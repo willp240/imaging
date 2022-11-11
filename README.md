@@ -32,7 +32,7 @@ A "MegaCube" is set up to scroll through 11 positions in x y and z. They are spa
 
 These xyz positions are scrolled through for 30 different initial times, 1 ns apart, centred on the fit time.
 
-For each initial time, the 3D grid of positions is scrolled through. For each position, for each hit, the time residual is calculated assuming the particle travelled from the fit position, to this position, and then emitted a photon. If the time residual is within 0.5 ns of 0 ns, the TH3D representing the cube for that initial time is filled at that position.
+For each initial time, the 3D grid of positions is scrolled through. For each hit, for each position, the time residual is calculated assuming the particle travelled from the fit position, to this position, and then emitted a photon. If the time residual is within 0.5 ns of 0 ns, the TH3D representing the cube for that initial time is filled at that position.
 
 All TH3DS are written to file.
 
