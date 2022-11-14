@@ -1,9 +1,9 @@
 # imaging
-Code for imaging events in SNO+
+Code for attempts at imaging events in SNO+
 
 To setup, first clone this repository
 
-Then edit env.sh to point to your specific directories. $IMAGING_ROOT is the directory you've just cloned into. $DATA_ROOT is where you want thingns to get written to (subdirectories below this will be created if using the condor batch script supplied).
+Then edit env.sh to point to your specific directories. $IMAGING_ROOT is the directory you've just cloned into. $DATA_ROOT is where you want things to get written to (subdirectories below this will be created if using the condor batch script supplied).
 You can also specify another environment files to get called when submitting jobs to batch systems. This should set your ROOT and everything else needed for RAT. Then you also specify your $RATROOT. $RATROOT/env.sh gets sourced when using the submission script.
 
 Then, to build, simply run:
@@ -19,12 +19,11 @@ There is a script setup for submitting to the Oxford batch machines with Condor.
 
 python submitCondor.py imaging /path/to/input/file jobname
 
-The ouput file will be written to $DATA_ROOT/jobname/jobname.root
-Logs, output, errors, and the submission files will be written to $DATA_ROOT/jobname/log/jobname.log, $DATA_ROOT/jobname/output/jobname.output, $DATA_ROOT/jobname/error/jobname.error, $DATA_ROOT/jobname/submit/jobname.submit and $DATA_ROOT/jobname/sh/jobname.sh
+The ouput file will be written to $DATA_ROOT/jobname/jobname.root. Logs, output, errors, and the submission files will be written to $DATA_ROOT/jobname/log/jobname.log, $DATA_ROOT/jobname/output/jobname.output, $DATA_ROOT/jobname/error/jobname.error, $DATA_ROOT/jobname/submit/jobname.submit and $DATA_ROOT/jobname/sh/jobname.sh.
 
 
 imaging.cc:
-The only app currenntly written is imaging.cc. This is still slightly hardcoded for specific file with a muon starting at (0,0,8500)mm going in the (0,0,-1) direction. This will be generalised in the future.
+The only app currently written is imaging.cc. This is still slightly hardcoded for specific file with a muon starting at (0,0,8500)mm going in the (0,0,-1) direction. This will be generalised in the future.
 
 The code first gets the event from the inputted file, the PMT info and the fitted position/time.
 
@@ -44,14 +43,20 @@ There is a plotting script, PlotTH3s.cc, with two functions.
 
 "PlotAll" takes in the output filename from running imaging.cc, and plots all 30 TH3Ds to a canvas. It also prints out the time offset of the TH3D with the highest integral.
 Run as:
+
 root -l
+
 .L PlotTH3s.cc+
+
 PlotAll("outputtedFileName.root")
 
 
 "Plot1" takes in the output filename from running imaging.cc, and the time offset for the histogram you want to draw.
 Run as:
+
 root -l
+
 .L PlotTH3s.cc+
+
 Plot1("outputtedFileName.root", timeOffset)
 
