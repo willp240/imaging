@@ -13,11 +13,11 @@ make
 
 Currently there is one executable, "imaging". To run it:
 
-./bin/imaging /path/to/input/file /path/to/output/file
+> ./bin/imaging /path/to/input/file /path/to/output/file
 
 There is a script setup for submitting to the Oxford batch machines with Condor. Run with:
 
-python submitCondor.py imaging /path/to/input/file jobname
+> python submitCondor.py imaging /path/to/input/file jobname
 
 The ouput file will be written to $DATA_ROOT/jobname/jobname.root. Logs, output, errors, and the submission files will be written to $DATA_ROOT/jobname/log/jobname.log, $DATA_ROOT/jobname/output/jobname.output, $DATA_ROOT/jobname/error/jobname.error, $DATA_ROOT/jobname/submit/jobname.submit and $DATA_ROOT/jobname/sh/jobname.sh.
 
@@ -44,19 +44,14 @@ There is a plotting script, PlotTH3s.cc, with two functions.
 "PlotAll" takes in the output filename from running imaging.cc, and plots all 30 TH3Ds to a canvas. It also prints out the time offset of the TH3D with the highest integral.
 Run as:
 
-root -l
-
-.L PlotTH3s.cc+
-
-PlotAll("outputtedFileName.root")
-
+> root -l
+> .L PlotTH3s.cc+
+> PlotAll("outputtedFileName.root")
 
 "Plot1" takes in the output filename from running imaging.cc, and the time offset for the histogram you want to draw.
 Run as:
 
-root -l
-
-.L PlotTH3s.cc+
-
-Plot1("outputtedFileName.root", timeOffset)
+> root -l
+> .L PlotTH3s.cc+
+> Plot1("outputtedFileName.root", timeOffset)
 
