@@ -45,13 +45,17 @@ There is a plotting script, PlotTH3s.cc, with two functions.
 Run as:
 
 > root -l
+> 
 > .L PlotTH3s.cc+
+> 
 > PlotAll("outputtedFileName.root")
 
 "Plot1" takes in the output filename from running imaging.cc, and the time offset for the histogram you want to draw.
 Run as:
 
 > root -l
+> 
 > .L PlotTH3s.cc+
+> 
 > Plot1("outputtedFileName.root", timeOffset)
 
