@@ -11,7 +11,7 @@ Then, to build, simply run:
 make
 
 
-Currently there is one executable, "imaging". To run it:
+Currently there are three executables, "imaging", "imaging_alg2" and "mcmc". They can be ran for example by:
 
 > ./bin/imaging /path/to/input/file /path/to/output/file
 
@@ -37,16 +37,24 @@ All TH3DS are written to file.
 
 The true and fitted times and positions are printed out initially. The true times are what is hardcoded here, as these are calculated as the time and position of the muon when it reaches the same Z as the fit position. The actual imaging doesn't use this so doesn't depend on any hard coding for a specific file.
 
+imaging_alg2.cc:
+
+This is similar to imaging, but rather than use the tof of muon+photon (which assumes straight path of the muon) we fit emission time at each position.
+
+mcmc.cc:
+
+Run an MCMC instead of grid search over times and positions.
+
 
 Plotting Scripts:
-There is a plotting script, PlotTH3s.cc, with two functions.
+There is a plotting script, PlotTH3s.cpp, with two functions.
 
 "PlotAll" takes in the output filename from running imaging.cc, and plots all 30 TH3Ds to a canvas. It also prints out the time offset of the TH3D with the highest integral.
 Run as:
 
 > root -l
 > 
-> .L PlotTH3s.cc+
+> .L PlotTH3s.cpp+
 > 
 > PlotAll("outputtedFileName.root")
 
@@ -55,7 +63,8 @@ Run as:
 
 > root -l
 > 
-> .L PlotTH3s.cc+
+> .L PlotTH3s.cpp+
 > 
 > Plot1("outputtedFileName.root", timeOffset)
 
+"BestTandLLH.cpp" is intended for use with the output of imaging_alg2.cc. It makes two TH3Ds, containing the best LLH and corresponding emission time for each position.
