@@ -21,7 +21,7 @@
 int main( int argc, char **argv ) {
 
   if (argc != 3) {
-    std::cout << "Syntax is $: imaging inputfile outputfile" << std::endl;
+    std::cout << "Syntax is $: imaging_alg2 inputfile outputfile" << std::endl;
     exit(-1);
   }
 
@@ -57,13 +57,13 @@ int main( int argc, char **argv ) {
   const double true_time = 3770 / 299.792;
 
   //// Set up the #cube
-  double cubesizex = 1000;
-  double cubesizey = 1000;
+  double cubesizex = 50;
+  double cubesizey = 50;
   double cubesizez = 50;
   double cubesizet = 1;
 
-  int    num_cubes = 3;
-  int    num_t0    = 3;
+  int    num_cubes = 11;
+  int    num_t0    = 15;
 
   double minx = fit_pos.X() - (num_cubes/(double)2) * cubesizex;
   double maxx = fit_pos.X() + (num_cubes/(double)2) * cubesizex;
@@ -75,9 +75,10 @@ int main( int argc, char **argv ) {
   double maxt = fit_time + (num_t0/(double)2) * cubesizet;
 
   //  TH3D* h3 = new TH3D( "h3", "h3", 10*num_cubes, minx, maxx, 10*num_cubes, miny, maxy, 10*num_cubes, minz, maxz );
-  TH3D* hists[30];
+  TH3D* hists[80];
   for(int i=0; i<num_t0; i++){
-    TString hname = Form("h_%f", mint+num_t0*i);
+    TString hname = Form("h_%d",i);
+    TString htitle = Form("h_%f",mint+cubesizet*i);
     hists[i] = new TH3D( hname, hname, 10*num_cubes, minx, maxx, 10*num_cubes, miny, maxy, 10*num_cubes, minz, maxz );
     hists[i]->GetXaxis()->SetTitle("X, mm  ");
     hists[i]->GetXaxis()->SetTitleOffset(1.5);
@@ -92,7 +93,7 @@ int main( int argc, char **argv ) {
   std::cout << "Fit Pos: " << fit_pos.X() << " " << fit_pos.Y() << " " << fit_pos.Z() << " " <<fit_pos.Mag() << std::endl;
   std::cout << "'True' Time: " << true_time << ", Fit Time: " << fit_time << std::endl;
 
-  std::cout << "Histogram Bounds: " << minx << " " << maxx << ", " << miny << " " << maxy << ", " << minz << " " << maxz << std::endl;
+  std::cout << "Histogram Bounds: " << minx << " " << maxx << ", " << miny << " " << maxy << ", " << minz << " " << maxz << " " << mint << " " << maxt << std::endl;
   int count = 0;
 
   // now loop over hits
@@ -103,7 +104,7 @@ int main( int argc, char **argv ) {
 
       // and loop over cubes
       for(int t = 0; t < num_t0; t++){
-	double cubet = (t * cubesizet) + mint;
+	double cubet = (t * cubesizet) + fit_time; //mint;
 
 	for(int x = 0; x < num_cubes; x++){
 	  for(int y = 0; y < num_cubes; y++){
@@ -114,10 +115,10 @@ int main( int argc, char **argv ) {
 	      double cubez = (z * cubesizez) + minz + cubesizez/2;
 	      TVector3 cubePos(cubex, cubey, cubez);
 
-	      double muondist = (cubePos - fit_pos).Mag();
-	      double photondist = (cubePos - pmtPos).Mag();
+	      if(cubex > 6000 || cubey > 6000 || cubez > 6000 || cubePos.Mag() > 6000)
+		continue;
 
-	      double muont = muondist / c;
+	      double photondist = (cubePos - pmtPos).Mag();
 
 	      double distInAV = 0.0;
 	      double distInWater = 0.0;
@@ -132,8 +133,8 @@ int main( int argc, char **argv ) {
 	      //double emisst1 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, fit_time + 12.5 + muont, false, 3.103125 * 1e-6, true, 0.0);
               //double emisst2 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, fit_time + 12.5 - muont, false, 3.103125 * 1e-6, true, 0.0);
 
-	      double emisst1 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, cubet + muont, false, 3.103125 * 1e-6, true, 0.0);
-              double emisst2 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, cubet - muont, false, 3.103125 * 1e-6, true, 0.0);
+	      double emisst1 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, cubet, false, 3.103125 * 1e-6, true, 0.0);
+              double emisst2 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, cubet, false, 3.103125 * 1e-6, true, 0.0);
 
 	      if(emisst1 > -0.5 && emisst1 < 0.5){
 		hists[t]->Fill(cubex, cubey, cubez);
