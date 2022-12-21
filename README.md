@@ -11,13 +11,17 @@ Then, to build, simply run:
 make
 
 
-Currently there are three executables, "imaging", "imaging_alg2" and "mcmc". They can be ran for example by:
+Currently there are five executables, "imaging", "imaging_alg2", "mcmc", "mcmc_fixedT, and "adaptive_grid". The two most useful (and developed) are probably "imaging_alg2" and "adaptive_grid". They can be ran for example by:
 
 > ./bin/imaging /path/to/input/file /path/to/output/file
 
-There is a script setup for submitting to the Oxford batch machines with Condor. Run with:
+There are a few scripts setup for submitting to the Oxford batch machines with Condor. Run with:
 
-> python submitCondor.py imaging /path/to/input/file jobname
+> python /submission/submitCondor.py imaging /path/to/input/file jobname
+
+or
+
+> python /submission/submitNoArgs.py adaptive_grid /path/to/input/file jobname
 
 The ouput file will be written to $DATA_ROOT/jobname/jobname.root. Logs, output, errors, and the submission files will be written to $DATA_ROOT/jobname/log/jobname.log, $DATA_ROOT/jobname/output/jobname.output, $DATA_ROOT/jobname/error/jobname.error, $DATA_ROOT/jobname/submit/jobname.submit and $DATA_ROOT/jobname/sh/jobname.sh.
 
@@ -45,6 +49,9 @@ mcmc.cc:
 
 Run an MCMC instead of grid search over times and positions.
 
+mcmc_fixedT.cc:
+
+Run an MCMC instead of grid search over positions for a fixed time. Submit to condor using submitFixedT.py. 
 
 Plotting Scripts:
 There is a plotting script, PlotTH3s.cpp, with two functions.
@@ -68,3 +75,13 @@ Run as:
 > Plot1("outputtedFileName.root", timeOffset)
 
 "BestTandLLH.cpp" is intended for use with the output of imaging_alg2.cc. It makes two TH3Ds, containing the best LLH and corresponding emission time for each position.
+
+"ConvertHist.cpp" was used for converting between histograms with each bin filled, and having only every tenth bin filled (to try and see in 3d better)
+
+"PlotFromTree.cpp" and "PlotMultTrees.cpp" are used for plotting from the output of the mcmc apps.
+
+"plotsph.py" was for testing drawing the AV on top of tracks
+
+Classes:
+"Cube" contains the centre coordinates of the cube your testing, it's "radius", best fit time, best fit overlap, and a method to divide it into a collection of sub cubes.
+"CubeCollection" is essentially a vector of cubes
