@@ -57,20 +57,21 @@ int main( int argc, char **argv ) {
   const double true_time = 3770 / 299.792;
 
   //// Set up the #cube
-  double cubesizex = 50;
-  double cubesizey = 50;
-  double cubesizez = 50;
+  double cubesizex = 100;
+  double cubesizey = 100;
+  double cubesizez = 100;
   double cubesizet = 1;
 
-  int    num_cubes = 11;
-  int    num_t0    = 15;
+  int    num_cubes = 10;
+  int    num_z     = 120;
+  int    num_t0    = 80;
 
   double minx = fit_pos.X() - (num_cubes/(double)2) * cubesizex;
   double maxx = fit_pos.X() + (num_cubes/(double)2) * cubesizex;
   double miny = fit_pos.Y() - (num_cubes/(double)2) * cubesizey;
   double maxy = fit_pos.Y() + (num_cubes/(double)2) * cubesizey;
-  double minz = fit_pos.Z() - (num_cubes) * cubesizez;
-  double maxz = fit_pos.Z();
+  double minz = fit_pos.Z() - (num_z) * cubesizez;
+  double maxz = fit_pos.Z() + (num_z) * cubesizez;
   double mint = fit_time - (num_t0/(double)2) * cubesizet;
   double maxt = fit_time + (num_t0/(double)2) * cubesizet;
 
@@ -79,7 +80,7 @@ int main( int argc, char **argv ) {
   for(int i=0; i<num_t0; i++){
     TString hname = Form("h_%d",i);
     TString htitle = Form("h_%f",mint+cubesizet*i);
-    hists[i] = new TH3D( hname, hname, 10*num_cubes, minx, maxx, 10*num_cubes, miny, maxy, 10*num_cubes, minz, maxz );
+    hists[i] = new TH3D( hname, hname, num_cubes, minx, maxx, num_cubes, miny, maxy, num_z, minz, maxz );
     hists[i]->GetXaxis()->SetTitle("X, mm  ");
     hists[i]->GetXaxis()->SetTitleOffset(1.5);
     hists[i]->GetYaxis()->SetTitle("Y, mm");
@@ -102,13 +103,16 @@ int main( int argc, char **argv ) {
       const RAT::DS::PMTCal& pmt = calibratedPMTs.GetPMT(j);
       const TVector3 pmtPos = pmtInfo.GetPosition( pmt.GetID() );
 
+      if(j%1 == 0)
+	std::cout << "PMT " << j << " of " << calibratedPMTs.GetCount() << std::endl;
+
       // and loop over cubes
       for(int t = 0; t < num_t0; t++){
-	double cubet = (t * cubesizet) + fit_time; //mint;
+	double cubet = (t * cubesizet) + mint;
 
 	for(int x = 0; x < num_cubes; x++){
 	  for(int y = 0; y < num_cubes; y++){
-	    for(int z = 0; z < num_cubes; z++){
+	    for(int z = 0; z < num_z; z++){
 
 	      double cubex = (x * cubesizex) + minx + cubesizex/2;
 	      double cubey = (y * cubesizey) + miny + cubesizey/2;
@@ -134,14 +138,14 @@ int main( int argc, char **argv ) {
               //double emisst2 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, fit_time + 12.5 - muont, false, 3.103125 * 1e-6, true, 0.0);
 
 	      double emisst1 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, cubet, false, 3.103125 * 1e-6, true, 0.0);
-              double emisst2 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, cubet, false, 3.103125 * 1e-6, true, 0.0);
+	      //double emisst2 = timeResCalc.CalcTimeResidual(pmt.GetID(), pmt.GetTime(), cubePos, cubet, false, 3.103125 * 1e-6, true, 0.0);
 
 	      if(emisst1 > -0.5 && emisst1 < 0.5){
 		hists[t]->Fill(cubex, cubey, cubez);
 	      }
-	      else if(emisst2 > -0.5 && emisst2 < 0.5){
-		hists[t]->Fill(cubex, cubey, cubez);
-	      }
+	      //	      else if(emisst2 > -0.5 && emisst2 < 0.5){
+	      //hists[t]->Fill(cubex, cubey, cubez);
+	      // }
 
 	    }
 	  }
