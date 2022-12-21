@@ -59,9 +59,9 @@ int main( int argc, char **argv ) {
 
   //// Adaptive grid parameters
   double t_res = 0.5;
-  double res = 1500;
-  double factor = 2;
-  int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / 100 );
+  double res = 100;
+  double factor = 10;
+  int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / res );
 
   //// Gonna make some histograms
   TH3D* h = new TH3D( "Overlap", "Overlap", num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
@@ -83,7 +83,7 @@ int main( int argc, char **argv ) {
 
   CubeCollection* init_cube_col = new CubeCollection();
 
-  // Loop xyz positions
+  // Loop xyz positions to make initial cubes
   for(double x = min_xyz + init_cube_rad; x < max_xyz; x += 2*init_cube_rad) {
     for(double y = min_xyz + init_cube_rad; y < max_xyz; y += 2*init_cube_rad) {
       for(double z = min_xyz + init_cube_rad; z < max_xyz; z += 2*init_cube_rad) {
@@ -94,6 +94,7 @@ int main( int argc, char **argv ) {
 
 	// Make cube
 	Cube* cub = new Cube( x, y, z, init_cube_rad );
+	// Get PMTs associated with the cube (at this point, all hit PMTs)
 	std::vector< RAT::DS::PMTCal > pmts;
 	for(size_t i_pmt = 0; i_pmt < calibrated_PMTs.GetCount(); i_pmt++) {
 	  RAT::DS::PMTCal pmt = calibrated_PMTs.GetPMT( i_pmt );
@@ -138,7 +139,7 @@ int main( int argc, char **argv ) {
 
 }
  
-
+// Function to recursively perform the adaptive grid
 void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, int num_t, double init_cube_size_t, double min_t, double t_res, double res, int factor ) {
 
   double best_global_overlap = 0;
@@ -156,6 +157,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
     double best_t = -999;
     std::vector< RAT::DS::PMTCal > best_pmt_list;
 
+    // Loop over emission times and count overlap to find best fit
     for(int t = 0; t < num_t; t++){
       double cube_t = (t * init_cube_size_t) + min_t;
       double overlap = 0;
@@ -170,12 +172,14 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
 	double emission_t = time_res_calc.CalcTimeResidual( pmt.GetID(), pmt.GetTime(), cube_pos, cube_t, false, 3.103125 * 1e-6, true, 0.0 );
 
 	if(emission_t > -t_res && emission_t < t_res){
+	  // If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
 	  overlap++;
 	  pmt_list.push_back( pmt );
 	}
       
       }  // End loop over hits
       
+      // Is it the best time for the cube so far?
       if(overlap > best_t_overlap) {
 	best_t_overlap = overlap;
 	best_pmt_list = pmt_list;
@@ -204,27 +208,28 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
     double cube_y = cub->GetY();
     double cube_z = cub->GetZ();
 
+    // If we're above the resolution, we might want to divide the cube into subcubes
     if( cub->GetRadius() > res ){
       
-      // if llh > 90% best
-      if( cub->GetLLH() > 0.58*best_global_overlap ) {
+      // If llh > 50% best
+      if( cub->GetLLH() > 0.5*best_global_overlap ) {
 	CubeCollection* new_col = cub->Divide( factor );
 	//t_res = t_res / ( factor/2 );
+
+	// Each new cube has same associated PMTs as the parent bigger cube
 	new_col->SetPMTs( cub->GetPMTs() );
 	
 	std::cout << "Dividing cube " << cube_x << " " << cube_y << " " << cube_z << std::endl;
-
+	
+	// Rerun adaptive grid on new collection
 	AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, num_t, init_cube_size_t, min_t, t_res, res, factor );
       }
       std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
     }
     else { 
-      //h->Fill( cube_x, cube_y, cube_z, cub->GetLLH() );
-      //h_t->Fill( cube_x, cube_y, cube_z, cub->GetT() );
-      std::cout << "Adding final cubes " << cube_x << " " << cube_y << " " << cube_z << std::endl;
+       std::cout << "Adding final cubes " << cube_x << " " << cube_y << " " << cube_z << std::endl;
       final_cube_col->AddCube( cub );
     }
-  } // end loop over cubes
+  } // End 2nd loop over cubes
 
-  //  return final_cube_col;
 }
