@@ -21,7 +21,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
 int main( int argc, char **argv ) {
 
   if (argc != 3) {
-    std::cout << "Syntax is $: adaptive_grid inputfile outputfile" << std::endl;
+    std::cout << "Syntax is $: adaptive_grid_noreducepmt inputfile outputfile" << std::endl;
     exit(-1);
   }
 
@@ -58,7 +58,7 @@ int main( int argc, char **argv ) {
 
 
   //// Adaptive grid parameters
-  double t_res = 5;
+  double t_res = 2.5;
   double res = 100;
   double factor = 10;
   int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / res );
@@ -161,7 +161,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
     for(int t = 0; t < num_t; t++){
       double cube_t = (t * init_cube_size_t) + min_t;
       double overlap = 0;
-      std::vector< RAT::DS::PMTCal > pmt_list;
+      //std::vector< RAT::DS::PMTCal > pmt_list;
 
       // Now loop over hits 
       std::vector< RAT::DS::PMTCal > pmts = cub->GetPMTs();
@@ -174,7 +174,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
 	if(emission_t > -t_res && emission_t < t_res){
 	  // If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
 	  overlap++;
-	  pmt_list.push_back( pmt );
+	  //pmt_list.push_back( pmt );
 	}
       
       }  // End loop over hits
@@ -182,7 +182,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
       // Is it the best time for the cube so far?
       if(overlap > best_t_overlap) {
 	best_t_overlap = overlap;
-	best_pmt_list = pmt_list;
+	//best_pmt_list = pmt_list;
 	best_t = cube_t;
       }
 
@@ -192,7 +192,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
 
     // Store overlap PMT IDs
     cub->SetLLH( best_t_overlap );
-    cub->SetPMTs( best_pmt_list );
+    //cub->SetPMTs( best_pmt_list );
     cub->SetT( best_t );
 
     if( best_t_overlap > best_global_overlap )
@@ -213,9 +213,10 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
     if( cub->GetRadius() > res ){
       
       // If llh > 50% best
-      if( cub->GetLLH() > 0.5*best_global_overlap ) {
+      if( cub->GetLLH() > 0.75*best_global_overlap ) {
 	CubeCollection* new_col = cub->Divide( factor );
-	t_res = t_res / ( factor );
+	t_res = t_res / ( factor / 2 );
+
 	// Each new cube has same associated PMTs as the parent bigger cube
 	new_col->SetPMTs( cub->GetPMTs() );
 	
@@ -225,7 +226,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
 
 	// Rerun adaptive grid on new collection
 	AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, num_t, init_cube_size_t, min_t, t_res, res, factor );
-	t_res = t_res * ( factor );
+	t_res = t_res * ( factor / 2 );
       }
       std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
     }
