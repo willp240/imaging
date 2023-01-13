@@ -29,3 +29,21 @@ CubeCollection* Cube::Divide( int factor ){
 
   return col;
 }
+
+
+void Cube::RemovePMTs( std::vector< RAT::DS::PMTCal > pmts_ ){
+
+  std::vector<double> pmt_ids;
+  for( int i_pmt = 0; i_pmt < pmts_.size(); i_pmt++ ){
+    pmt_ids.push_back( pmts_.at( i_pmt ).GetID() );
+  }
+
+  for( int i_pmt = 0; i_pmt < fPMTs.size(); i_pmt++ ){
+    double id = fPMTs.at(i_pmt).GetID();
+    if( std::find(pmt_ids.begin(), pmt_ids.end(), id) != pmt_ids.end() ){
+      fPMTs.erase( fPMTs.begin() + i_pmt );
+      i_pmt--;
+    }	
+  }
+
+}

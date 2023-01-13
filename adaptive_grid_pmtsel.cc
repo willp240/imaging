@@ -18,6 +18,8 @@
 
 void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, int num_t, double init_cube_size_t, double min_t, double t_res, double res, int factor );
 
+double CalcOverlap( CubeCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, int num_t, double init_cube_size_t, double min_t, double t_res );
+
 int main( int argc, char **argv ) {
 
   if (argc != 3) {
@@ -126,6 +128,7 @@ int main( int argc, char **argv ) {
     double cube_t = cub->GetT();
     double overlap = cub->GetLLH();
 
+    std::cout << "Filling " << cube_x << " " << cube_y << " " << cube_z << " " << overlap << " " << cube_t << std::endl;
     h->Fill( cube_x, cube_y, cube_z, overlap );
     h_t->Fill( cube_x, cube_y, cube_z, cube_t );
   }
@@ -142,8 +145,13 @@ int main( int argc, char **argv ) {
 // Function to recursively perform the adaptive grid
 void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, int num_t, double init_cube_size_t, double min_t, double t_res, double res, int factor ) {
 
-  double best_global_overlap = 0;
+  double best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs, num_t, init_cube_size_t, min_t, t_res );
 
+  col->RemoveRepeatedPMTs();
+  
+  best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs, num_t, init_cube_size_t, min_t, t_res );
+
+  /*
   // Loop Cubes
   for( int i_cube = 0; i_cube < col->GetNCubes(); i_cube++ ){
     
@@ -198,7 +206,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
     if( best_t_overlap > best_global_overlap )
       best_global_overlap = best_t_overlap;
 
-  } // End loop over cubes
+  } // End loop over cubes */
 
   // Loop Cubes
   for( int i_cube = 0; i_cube < col->GetNCubes(); i_cube++ ){
@@ -213,7 +221,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
     if( cub->GetRadius() > res ){
       
       // If llh > 50% best
-      if( cub->GetLLH() > 0.5*best_global_overlap ) {
+      if( cub->GetLLH() > 0 ) { // 0.5*best_global_overlap ) {
 	CubeCollection* new_col = cub->Divide( factor );
 	t_res = t_res / ( factor/2 );
 	// Each new cube has same associated PMTs as the parent bigger cube
@@ -234,5 +242,70 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
       final_cube_col->AddCube( cub );
     }
   } // End 2nd loop over cubes
+
+}
+
+
+double CalcOverlap( CubeCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, int num_t, double init_cube_size_t, double min_t, double t_res ) {
+
+  double best_global_overlap = 0;
+
+  // Loop Cubes
+  for( int i_cube = 0; i_cube < col->GetNCubes(); i_cube++ ){
+
+    Cube* cub = col->GetCube( i_cube );
+    double cube_x = cub->GetX();
+    double cube_y = cub->GetY();
+    double cube_z = cub->GetZ();
+    TVector3 cube_pos( cube_x, cube_y, cube_z );
+    
+    double best_t_overlap = -999;
+    double best_t = -999;
+    std::vector< RAT::DS::PMTCal > best_pmt_list;
+    
+    // Loop over emission times and count overlap to find best fit
+    for(int t = 0; t < num_t; t++){
+      double cube_t = (t * init_cube_size_t) + min_t;
+      double overlap = 0;
+      std::vector< RAT::DS::PMTCal > pmt_list;
+      
+      // Now loop over hits
+      std::vector< RAT::DS::PMTCal > pmts = cub->GetPMTs();
+      for( size_t i_pmt = 0; i_pmt < pmts.size(); i_pmt++ ) {
+	
+	// Loop PMTs & get LLH
+	const RAT::DS::PMTCal pmt = pmts.at( i_pmt );
+	double emission_t = time_res_calc.CalcTimeResidual( pmt.GetID(), pmt.GetTime(), cube_pos, cube_t, false, 3.103125 * 1e-6, true, 0.0 );
+	
+	if(emission_t > -t_res && emission_t < t_res){
+	  // If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
+	  overlap++;
+	  pmt_list.push_back( pmt );
+	}
+	
+      }  // End loop over hits
+      
+      // Is it the best time for the cube so far?
+      if(overlap > best_t_overlap) {
+	best_t_overlap = overlap;
+	best_pmt_list = pmt_list;
+	best_t = cube_t;
+      }
+      
+    } // End loop over time offsets
+    
+    std::cout << "Cube at " << cube_x << " " << cube_y << " " << cube_z << " best overlap " << best_t_overlap << " at " << best_t << std::endl;
+    
+    // Store overlap PMT IDs
+    cub->SetLLH( best_t_overlap );
+    cub->SetPMTs( best_pmt_list );
+    cub->SetT( best_t );
+    
+    if( best_t_overlap > best_global_overlap )
+      best_global_overlap = best_t_overlap;
+    
+  } // End loop over cubes
+
+  return best_global_overlap;
 
 }

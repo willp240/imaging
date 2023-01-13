@@ -27,6 +27,8 @@ class CubeCollection{
   int GetMaxLLHCube();
   void SetPMTs( std::vector< RAT::DS::PMTCal > pmts_ );
   std::vector< RAT::DS::PMTCal > GetPMTs() { return fPMTs; }
+  void SortByOverlap();
+  void RemoveRepeatedPMTs();
 
   private:
   ////// Cube Details
