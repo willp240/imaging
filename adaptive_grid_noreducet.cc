@@ -73,13 +73,13 @@ int main( int argc, char **argv ) {
   h->GetZaxis()->SetTitleOffset(1.3);
   h->SetLineWidth(0);
   TH3D* h_t = new TH3D( "EmissionT", "EmissionT", num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
-  h->GetXaxis()->SetTitle("X, mm  ");
-  h->GetXaxis()->SetTitleOffset(1.5);
-  h->GetYaxis()->SetTitle("Y, mm");
-  h->GetYaxis()->SetTitleOffset(2.0);
-  h->GetZaxis()->SetTitle("Z, mm");
-  h->GetZaxis()->SetTitleOffset(1.3);
-  h->SetLineWidth(0);
+  h_t->GetXaxis()->SetTitle("X, mm  ");
+  h_t->GetXaxis()->SetTitleOffset(1.5);
+  h_t->GetYaxis()->SetTitle("Y, mm");
+  h_t->GetYaxis()->SetTitleOffset(2.0);
+  h_t->GetZaxis()->SetTitle("Z, mm");
+  h_t->GetZaxis()->SetTitleOffset(1.3);
+  h_t->SetLineWidth(0);
 
   CubeCollection* init_cube_col = new CubeCollection();
 
