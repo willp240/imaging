@@ -1,0 +1,16 @@
+# All backup files
+*~
+
+# Compiled files
+*.pyc
+*.d
+*.so
+*.os
+*.o
+
+bin/
+build/
+outputs/
+lib/
+*.root
+
