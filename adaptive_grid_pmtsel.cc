@@ -60,7 +60,7 @@ int main( int argc, char **argv ) {
 
 
   //// Adaptive grid parameters
-  double t_res = 2.5;
+  double t_res = 3.5;
   double res = 100;
   double factor = 10;
   int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / res );
@@ -169,7 +169,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
       // If llh > 50% best
       if( cub->GetLLH() > 0 ) { // 0.5*best_global_overlap ) {
 	CubeCollection* new_col = cub->Divide( factor );
-	t_res = t_res / ( factor/2 );
+	t_res = t_res / ( factor );
 	// Each new cube has same associated PMTs as the parent bigger cube
 	new_col->SetPMTs( cub->GetPMTs() );
 	
@@ -179,7 +179,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
 
 	// Rerun adaptive grid on new collection
 	AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, num_t, init_cube_size_t, min_t, t_res, res, factor );
-	t_res = t_res * ( factor/2 );
+	t_res = t_res * ( factor );
       }
       std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
     }
