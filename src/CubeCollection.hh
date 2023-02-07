@@ -29,6 +29,7 @@ class CubeCollection{
   std::vector< RAT::DS::PMTCal > GetPMTs() { return fPMTs; }
   void SortByOverlap();
   void RemoveRepeatedPMTs();
+  void RemovePMTs( std::vector< RAT::DS::PMTCal > pmts );
 
   private:
   ////// Cube Details

@@ -34,3 +34,12 @@ void CubeCollection::SortByOverlap( ) {
     });
 
 }
+
+
+void CubeCollection::RemovePMTs( std::vector< RAT::DS::PMTCal > pmts ) {
+
+  for( size_t i_cube = 1; i_cube < this->GetNCubes(); i_cube++ ) {
+    fCubeVec.at( i_cube )->RemovePMTs( pmts );
+  }
+
+}
