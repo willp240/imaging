@@ -43,3 +43,11 @@ void CubeCollection::RemovePMTs( std::vector< RAT::DS::PMTCal > pmts ) {
   }
 
 }
+
+
+CubeCollection::~CubeCollection() {
+  for( size_t i_cube = 0; i_cube < fCubeVec.size(); i_cube++ ) {
+    delete fCubeVec.at(i_cube);
+  }
+  fCubeVec.clear();
+}

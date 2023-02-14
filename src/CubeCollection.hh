@@ -19,6 +19,7 @@ class CubeCollection{
 
   public:
   CubeCollection( ) {};
+   ~CubeCollection();
 
   void AddCube( Cube* cube_ ) { fCubeVec.push_back( cube_ ); }
   Cube* GetCube( int i_ ) { return fCubeVec.at( i_ ); }
