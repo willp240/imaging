@@ -20,7 +20,7 @@ void FindBestMiniCubes( CubeCollection* col, CubeCollection* &final_cube_col, RA
 
 double CalcOverlap( CubeCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, int num_t, double init_cube_size_t, double min_t, double t_res );
 
-std::vector< RAT::DS::PMTCal > RemovePMTs(std::vector< RAT::DS::PMTCal > pmt_vec, std::vector< RAT::DS::PMTCal > pmts_to_remove);
+void RemovePMTs(std::vector< RAT::DS::PMTCal > &pmt_vec, std::vector< RAT::DS::PMTCal > pmts_to_remove);
 
 int main( int argc, char **argv ) {
 
@@ -28,7 +28,7 @@ int main( int argc, char **argv ) {
     std::cout << "Syntax is $: adaptive_grid inputfile outputfile" << std::endl;
     exit(-1);
   }
-
+  std::cout << "in here " << std::endl;
   const std::string fname = argv[1];
   const std::string out_fname = argv[2];
 
@@ -38,25 +38,25 @@ int main( int argc, char **argv ) {
   //// RAT begin of runs etc
   RAT::DU::PMTInfo pmt_info = RAT::DU::Utility::Get()->GetPMTInfo();
   RAT::DU::TimeResidualCalculator time_res_calc = RAT::DU::Utility::Get()->GetTimeResidualCalculator();
-
+  std::cout << "in here " << std::endl;
   // Get event and fit vertex
   const RAT::DS::Entry& r_DS = ds_reader.GetEntry( 0 );
   const RAT::DS::MC& mc = r_DS.GetMC();
   const RAT::DS::EV& r_Ev = r_DS.GetEV( 0 );
-
+  std::cout << "in here " << std::endl;
   const RAT::DS::FitVertex& r_vertex = r_Ev.GetFitResult("scintFitter").GetVertex(0);
   const TVector3 fit_pos = r_vertex.GetPosition();
   const double fit_time = r_vertex.GetTime();
 
   RAT::DS::CalPMTs calibrated_PMTs = r_Ev.GetCalPMTs();
-
+  std::cout << "in here " << std::endl;
   //// Set up the #cube
   int    num_t = 80;
   double init_cube_size_t = 1;
   double min_t = fit_time - (num_t/2);
 
-  double min_xyz = -5500;
-  double max_xyz = 5500;
+  double min_xyz = -250;
+  double max_xyz = 250;
   double init_cube_rad = 500;
   int    init_num_cubes = floor( ( max_xyz - min_xyz ) / init_cube_rad );
 
@@ -91,7 +91,7 @@ int main( int argc, char **argv ) {
   for(double x = min_xyz + init_cube_rad; x < max_xyz; x += 2*init_cube_rad) {
     for(double y = min_xyz + init_cube_rad; y < max_xyz; y += 2*init_cube_rad) {
       for(double z = min_xyz + init_cube_rad; z < max_xyz; z += 2*init_cube_rad) {
-
+	      std::cout << "in here " << std::endl;
         TVector3 cube_pos(x, y, z);
 	      if( cube_pos.Mag() > 5500)
 	        continue;
@@ -182,7 +182,7 @@ std::vector< RAT::DS::PMTCal > pmt_vec = col->GetCube(0)->GetPMTs();
     // Get PMTs of cube
     std::vector< RAT::DS::PMTCal > pmt_vec_cub = mini_cub->GetPMTs();
     // Remove these from list
-    std::vector< RAT::DS::PMTCal > updated_pmt_vec = RemovePMTs(pmt_vec, pmt_vec_cub);
+    RemovePMTs(pmt_vec, pmt_vec_cub);
   }
 
 }
@@ -246,7 +246,7 @@ double CalcOverlap( CubeCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::Ti
 }
 
 
-std::vector< RAT::DS::PMTCal > RemovePMTs(std::vector< RAT::DS::PMTCal > pmt_vec, std::vector< RAT::DS::PMTCal > pmts_to_remove) {
+void RemovePMTs(std::vector< RAT::DS::PMTCal > &pmt_vec, std::vector< RAT::DS::PMTCal > pmts_to_remove) {
 
   std::vector<double> pmt_ids;
   for( int i_pmt = 0; i_pmt < pmts_to_remove.size(); i_pmt++ ){
@@ -260,7 +260,4 @@ std::vector< RAT::DS::PMTCal > RemovePMTs(std::vector< RAT::DS::PMTCal > pmt_vec
       i_pmt--;
     }	
   }
-
-  std::vector< RAT::DS::PMTCal > updated_vec = pmt_vec;
-  return updated_vec;
 }
