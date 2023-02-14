@@ -18,25 +18,7 @@ LIB_NAME=img
 
 LIB=$(LIB_DIR)/lib$(LIB_NAME).a
 
-all: bin/imaging bin/imaging_alg2 bin/mcmc bin/mcmc_fixedT bin/adaptive_grid bin/adaptive_grid_noreducet bin/adaptive_grid_noreducepmt bin/adaptive_grid_1layer bin/adaptive_grid_pmtsel bin/adaptive_grid_twindow bin/adaptive_grid_pmtsel_1cub
-
-#all: bin/test bin/adaptive_grid_pmtsel_b
-
-bin/imaging: imaging.cc $(LIB)
-	mkdir -p bin
-	$(CXX) imaging.cc -I$(RAT_EXTRN_INC) -I$(RAT_INC) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
-
-bin/imaging_alg2: imaging_alg2.cc $(LIB)
-	mkdir -p bin
-	$(CXX) imaging_alg2.cc -I$(RAT_EXTRN_INC) -I$(RAT_INC) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
-
-bin/mcmc: mcmc.cc $(LIB)
-	mkdir -p bin
-	$(CXX) mcmc.cc -I$(RAT_EXTRN_INC) -I$(RAT_INC) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
-
-bin/mcmc_fixedT: mcmc_fixedT.cc $(LIB)
-	mkdir -p bin
-	$(CXX) mcmc_fixedT.cc -I$(RAT_EXTRN_INC) -I$(RAT_INC) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
+all: bin/adaptive_grid bin/adaptive_grid_noreducet bin/adaptive_grid_noreducepmt bin/adaptive_grid_pmtsel bin/adaptive_grid_tsel
 
 bin/adaptive_grid: adaptive_grid.cc $(LIB)
 	mkdir -p bin
@@ -50,17 +32,13 @@ bin/adaptive_grid_noreducepmt: adaptive_grid_noreducepmt.cc $(LIB)
 	mkdir -p bin
 	$(CXX) adaptive_grid_noreducepmt.cc -I./ -I$(SRC_FILES) -I$(RAT_EXTRN_INC) -I$(RAT_INC) -I$(INC_DIR) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
 
-bin/adaptive_grid_1layer: adaptive_grid_1layer.cc $(LIB)
-	mkdir -p bin
-	$(CXX) adaptive_grid_1layer.cc -I./ -I$(SRC_FILES) -I$(RAT_EXTRN_INC) -I$(RAT_INC) -I$(INC_DIR) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
-
 bin/adaptive_grid_pmtsel: adaptive_grid_pmtsel.cc $(LIB)
 	mkdir -p bin
 	$(CXX) adaptive_grid_pmtsel.cc -I./ -I$(SRC_FILES) -I$(RAT_EXTRN_INC) -I$(RAT_INC) -I$(INC_DIR) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
 
-bin/adaptive_grid_pmtsel_1cub: adaptive_grid_pmtsel_1cub.cc $(LIB)
+bin/adaptive_grid_tsel: adaptive_grid_tsel.cc $(LIB)
 	mkdir -p bin
-	$(CXX) adaptive_grid_pmtsel_1cub.cc -I./ -I$(SRC_FILES) -I$(RAT_EXTRN_INC) -I$(RAT_INC) -I$(INC_DIR) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
+	$(CXX) adaptive_grid_tsel.cc -I./ -I$(SRC_FILES) -I$(RAT_EXTRN_INC) -I$(RAT_INC) -I$(INC_DIR) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
 
 $(LIB) : $(OBJ_FILES)
 	mkdir -p $(LIB_DIR)
@@ -72,15 +50,9 @@ build/%.o : src/%.cc
 
 clean:
 	rm -f build/*
-	rm -f bin/imaging
-	rm -f bin/imaging_alg2
-	rm -f bin/mcmc
-	rm -f bin/mcmc_fixedT
 	rm -f bin/adaptive_grid
 	rm -f bin/adaptive_grid_noreducet
 	rm -f bin/adaptive_grid_noreducepmt
-	rm -f bin/adaptive_grid_1layer
 	rm -f bin/adaptive_grid_pmtsel
-	rm -f bin/adaptive_grid_pmtsel_1cub
-	rm -f bin/test
+	rm -f bin/adaptive_grid_tsel
 	rm -f lib/*
