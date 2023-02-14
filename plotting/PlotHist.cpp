@@ -50,7 +50,7 @@ void PlotItThen(TString fname){
 	      
 	      double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
 	      if( llh > bestllh)
-		bestllh = llh;
+		      bestllh = llh;
 	    }
 	  }
 	}
@@ -60,11 +60,11 @@ void PlotItThen(TString fname){
             for(int z=0; z<10; z++){
 
               double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
-	      double t = h_t->GetBinContent( i*10+x, j*10+y, k*10+z );
-	      if( llh > 0 ) { //0.95*bestllh && llh > 900 ){
-		new_llh->SetBinContent( i*10+x, j*10+y, k*10+z, llh );
-		new_t->SetBinContent( i*10+x, j*10+y, k*10+z, t );
-	      }
+	            double t = h_t->GetBinContent( i*10+x, j*10+y, k*10+z );
+	            if( llh > 0.5*bestllh ){
+		            new_llh->SetBinContent( i*10+x, j*10+y, k*10+z, llh );
+		            new_t->SetBinContent( i*10+x, j*10+y, k*10+z, t );
+	            }
 	      
             }
           }
@@ -108,7 +108,7 @@ void PlotItThen(TString fname){
   new_llh->GetZaxis()->SetTitleOffset(1.7);
   new_llh->GetZaxis()->SetLabelSize(0.03);
   //new_llh->GetZaxis()->SetLabelFont(42);
-  new_llh->SetMinimum(800);
+  //new_llh->SetMinimum(800);
   gPad->Update();
   TPaletteAxis *palette = (TPaletteAxis*)new_llh->GetListOfFunctions()->FindObject("palette");
   palette->SetX1NDC(0.88);
@@ -200,8 +200,8 @@ void StraightPlot(TString fname){
         //if(tbin>0)
           //std::cout << tbin << " " << tvec.at(tbin) << " " << h_llh->GetBinContent(i,j,k) << std::endl;
        	if( h_llh->GetBinContent(i,j,k)>0){// && h_llh->GetBinContent(i,j,k) > tvec.at(tbin) ){
-	        new_llh->SetBinContent(i,j,k, h_llh->GetBinContent(i,j,k));
-	        new_t->SetBinContent(i,j,k, h_t->GetBinContent(i,j,k));
+	  new_llh->SetBinContent(i,j,k, h_llh->GetBinContent(i,j,k));
+	  new_t->SetBinContent(i,j,k, h_t->GetBinContent(i,j,k));
           /*
           if(tvec.at(tbin) > 0){
             new_llh->SetBinContent(tx.at(tbin),ty.at(tbin),tz.at(tbin),0);
@@ -212,7 +212,7 @@ void StraightPlot(TString fname){
           tx.at(tbin) = i;
           ty.at(tbin) = j;
           tz.at(tbin) = k;*/
-	      }
+	}
       }
     }
   }
@@ -282,7 +282,7 @@ void StraightPlot(TString fname){
   new_t->GetZaxis()->SetTitleOffset(1.7);
   new_t->GetZaxis()->SetLabelSize(0.03);
   //new_t->GetZaxis()->SetLabelFont(42);
-  new_t->SetMinimum(270);
+  new_t->SetMinimum(250);
   gPad->Update();
   palette = (TPaletteAxis*)new_t->GetListOfFunctions()->FindObject("palette");
   palette->SetX1NDC(0.88);

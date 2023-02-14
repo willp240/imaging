@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 
-void ConvertHist(TString fname){
+void ConvertHistNeg(TString fname){
 
   TFile *f = TFile::Open(fname);
 
@@ -31,7 +31,7 @@ void ConvertHist(TString fname){
   for(int i=0; i<=new_t->GetXaxis()->GetNbins(); i++){
     for(int j=0; j<=new_t->GetYaxis()->GetNbins(); j++){
       for(int k=0; k<=new_t->GetZaxis()->GetNbins(); k++){
-	      new_llh->SetBinContent(i,j,k,0);
+	new_llh->SetBinContent(i,j,k,0);
       }
     }
   }
@@ -41,13 +41,13 @@ void ConvertHist(TString fname){
     double bestllh = 0;
     for(int i=0; i<10; i++){
       for(int j=0; j<10; j++){
-	      for(int k=cube*10; k<=(cube*10+10); k++){
-	        double llh = h_llh->GetBinContent(30+(i), 60+(j), (k+1));
-	        std::cout << llh << " in " << 30+(i) << " " << 60+(j) << " " << (k+1) << std::endl;
+	for(int k=cube*10; k<=(cube*10+10); k++){
+	  double llh = h_llh->GetBinContent(30+(i), 60+(j), (k+1));
+	  std::cout << llh << " in " << 30+(i) << " " << 60+(j) << " " << (k+1) << std::endl;
           std::cout << -6000 + (30+(i)) * 100 << " " << -6000 + (60+(j)) * 100 << " " << -6000 + (k+1)*100 << std::endl;
-	        if(llh>bestllh)
-	          bestllh=llh;
-	      }
+	  if(llh>bestllh)
+	    bestllh=llh;
+	}
       }
     }
 
@@ -56,14 +56,14 @@ void ConvertHist(TString fname){
     for(int i=0; i<10; i++){
       for(int j=0; j<10; j++){
         for(int k=cube*10; k<(cube*10 +10); k++){
-	        double llh = h_llh->GetBinContent(30+(i), 60+(j), (k+1));
-	        double t = h_t->GetBinContent(30+(i), 60+(j), (k+1));
-	        if(llh>bestllh*0.95){
-            new_llh->SetBinContent(30+(i), 60+(j), k+1, llh);
-	          new_t->SetBinContent(30+(i), 60+(j), k+1, t);
-	          //std::cout << "Filling " << llh << " in " << 55+i << " " << 55+j << " " << k+1 << std::endl;
-	        }
-	      }
+	  double llh = h_llh->GetBinContent(30+(i), 60+(j), (k+1));
+	  double t = h_t->GetBinContent(30+(i), 60+(j), (k+1));
+	  if(llh>bestllh*0.95 && llh>200 ){
+	    new_llh->SetBinContent(30+(i), 60+(j), k+1, llh);
+	    new_t->SetBinContent(30+(i), 60+(j), k+1, t);
+	    //std::cout << "Filling " << llh << " in " << 55+i << " " << 55+j << " " << k+1 << std::endl;
+	  }
+	}
       }
     }
     
@@ -145,7 +145,7 @@ void ConvertHist(TString fname){
   g->Draw("AP SAME");
   
   //gPad->Update();
-  TFile fout("outputconv99.root","RECREATE");
+  TFile fout("outputNeg.root","RECREATE");
   new_t->SetLineWidth(0);
   new_llh->SetLineWidth(0);
   new_t->Write("new_t");

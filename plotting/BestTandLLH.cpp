@@ -44,24 +44,24 @@ void PlotAll(TString fname){
 
     for(int j=0; j<h->GetXaxis()->GetNbins(); j++){
       for(int k=0; k<h->GetYaxis()->GetNbins(); k++){
-	for(int l=0; l<h->GetZaxis()->GetNbins(); l++){
-	  if(h->GetBinContent(j, k, l) > h_llh->GetBinContent(j, k, l)){
-	    h_llh->SetBinContent(j, k, l, h->GetBinContent(j,k,l));
-	    //if(h->GetBinContent(j, k, l) > 450)
-	      h_t->SetBinContent(j, k, l, t);
-	  }
-	}
+      	for(int l=0; l<h->GetZaxis()->GetNbins(); l++){
+	        if(h->GetBinContent(j, k, l) > h_llh->GetBinContent(j, k, l)){
+	          h_llh->SetBinContent(j, k, l, h->GetBinContent(j,k,l));
+	          //if(h->GetBinContent(j, k, l) > 600)
+	          h_t->SetBinContent(j, k, l, t);
+	        }
+	      }
       }
     }    
   }
 
-  TColor::InvertPalette();
+  //TColor::InvertPalette();
   c1->cd();
   h_t->Draw("box2Z");
   c2->cd();
   h_llh->Draw("box2Z");
 
-  TFile fout("output.root","RECREATE");
+  TFile fout("outputNegX.root","RECREATE");
   h_t->Write("h_t");
   h_llh->Write("h_llh");
   
