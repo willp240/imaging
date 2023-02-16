@@ -61,7 +61,7 @@ int main( int argc, char **argv ) {
 
   //// Adaptive grid parameters
   double t_res = 0.5;
-  double res = 550;
+  double res = 100;
   double factor = 10;
   int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / 100 );
 
@@ -161,6 +161,10 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
 
   double best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs, init_cube_size_t, t_emit, t_res );
 
+  col->RemoveRepeatedPMTs();
+
+  best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs, init_cube_size_t, t_emit, t_res );
+
   //// Loop Cubes
   for( int i_cube = 0; i_cube < col->GetNCubes(); i_cube++ ){
     // std::cout << "final loop " << i_cube << " out of " << col->GetNCubes() << std::endl;
@@ -174,7 +178,7 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
     if( cub->GetRadius() > res ){
       
       //// If llh > 50% best
-      if( cub->GetLLH() > 0.5*best_global_overlap ) {
+      if( cub->GetLLH() > 0 ){ // 0.5*best_global_overlap ) {
 	      CubeCollection* new_col = cub->Divide( factor );
 	      t_res = t_res / ( factor );
 	      //// Each new cube has same associated PMTs as the parent bigger cube
