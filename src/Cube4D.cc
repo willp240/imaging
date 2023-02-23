@@ -36,15 +36,15 @@ Cube4DCollection* Cube4D::Divide( int factor ){
 }
 
 
-void Cube4D::RemovePMTs( std::vector< RAT::DS::PMTCal > pmts_ ){
+void Cube4D::RemovePMTs( std::vector< std::pair< UInt_t, double > > pmts_ ){
 
   std::vector<double> pmt_ids;
   for( int i_pmt = 0; i_pmt < pmts_.size(); i_pmt++ ){
-    pmt_ids.push_back( pmts_.at( i_pmt ).GetID() );
+    pmt_ids.push_back( pmts_.at( i_pmt ).first );
   }
 
   for( int i_pmt = 0; i_pmt < fPMTs.size(); i_pmt++ ){
-    double id = fPMTs.at(i_pmt).GetID();
+    double id = fPMTs.at(i_pmt).first;
     if( std::find(pmt_ids.begin(), pmt_ids.end(), id) != pmt_ids.end() ){
       fPMTs.erase( fPMTs.begin() + i_pmt );
       i_pmt--;

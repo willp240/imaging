@@ -38,9 +38,9 @@ class Cube4D{
   double GetTRadius() const { return fTRadius; }
   void SetLLH( double llh_ ) { fLLH = llh_; }
   double GetLLH() const { return fLLH; }
-  void SetPMTs( std::vector< RAT::DS::PMTCal > pmts_ ) { fPMTs = pmts_; }
-  void RemovePMTs( std::vector< RAT::DS::PMTCal > pmts_ );
-  std::vector< RAT::DS::PMTCal > GetPMTs() const { return fPMTs; }
+  void SetPMTs( std::vector< std::pair< UInt_t, double > > pmts_ ) { fPMTs = pmts_; }
+  void RemovePMTs( std::vector< std::pair< UInt_t, double > > pmts_ );
+  std::vector< std::pair< UInt_t, double > > GetPMTs() const { return fPMTs; }
 
   Cube4DCollection* Divide( int factor );
 
@@ -53,7 +53,7 @@ class Cube4D{
   double fRadius;
   double fTRadius;
   double fLLH = 0;
-  std::vector< RAT::DS::PMTCal > fPMTs;
+  std::vector< std::pair< UInt_t, double > > fPMTs;
 
 };
 

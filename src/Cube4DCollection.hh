@@ -26,18 +26,18 @@ class Cube4DCollection{
   int GetNCubes() { return fCubeVec.size(); }
   double GetMaxLLH();
   int GetMaxLLHCube();
-  void SetPMTs( std::vector< RAT::DS::PMTCal > pmts_ );
-  std::vector< RAT::DS::PMTCal > GetPMTs() { return fPMTs; }
+  void SetPMTs( std::vector< std::pair< UInt_t, double > > pmts_ );
+  std::vector< std::pair< UInt_t, double > > GetPMTs() { return fPMTs; }
   void SortByOverlap();
   void RemoveRepeatedPMTs();
-  void RemovePMTs( std::vector< RAT::DS::PMTCal > pmts );
+  void RemovePMTs( std::vector< std::pair< UInt_t, double > > pmts );
 
   private:
   ////// Cube Details
   std::vector<Cube4D*> fCubeVec;
   double fMaxLLH;
   int fMaxLLHCube;
-  std::vector< RAT::DS::PMTCal > fPMTs;
+  std::vector<std::pair< UInt_t, double > > fPMTs;
 
 };
 #endif // __CUBE4DCOLLECTION__

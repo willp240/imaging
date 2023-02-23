@@ -54,8 +54,8 @@ int main( int argc, char **argv ) {
   double min_t = fit_time - 2*init_cube_rad_t*(init_num_t/2);
   double max_t = fit_time + 2*init_cube_rad_t*(init_num_t/2);
 
-  double min_xyz = -1500;
-  double max_xyz = 1500;
+  double min_xyz = -5500;
+  double max_xyz = 5500;
   double init_cube_rad = 500;
   int    init_num_cubes = floor( ( max_xyz - min_xyz ) / 2*init_cube_rad );
 
@@ -86,10 +86,13 @@ int main( int argc, char **argv ) {
   std::cout << std::endl;
 
   //// Make vector of pmts to assign to each initial cube
-	std::vector< RAT::DS::PMTCal > pmts;
+	std::vector< std::pair < UInt_t, double > > pmts;
 	for(size_t i_pmt = 0; i_pmt < calibrated_PMTs.GetCount(); i_pmt++) {
 	  RAT::DS::PMTCal pmt = calibrated_PMTs.GetPMT( i_pmt );
-    pmts.push_back( pmt );
+    UInt_t PMT_ID = pmt.GetID();
+    double PMT_t = pmt.GetTime();
+    std::pair < UInt_t, double > pmt_pair( PMT_ID, PMT_t);
+    pmts.push_back( pmt_pair );
 	}
 
   Cube4DCollection* init_cube_col = new Cube4DCollection;
@@ -223,20 +226,20 @@ double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::
     double cube_rad_t = cub->GetTRadius();
 
     double overlap = 0;
-    std::vector< RAT::DS::PMTCal > pmt_list;
+    std::vector<std::pair< UInt_t, double > > pmt_list;
 
     //// Now loop over hits
-    std::vector< RAT::DS::PMTCal > pmts = cub->GetPMTs();
+    std::vector< std::pair< UInt_t, double > > pmts = cub->GetPMTs();
     for( size_t i_pmt = 0; i_pmt < pmts.size(); i_pmt++ ) {
 
 	    //// Loop PMTs & get LLH
-	    const RAT::DS::PMTCal pmt = pmts.at( i_pmt );
-	    double emission_t = time_res_calc.CalcTimeResidual( pmt.GetID(), pmt.GetTime(), cube_pos, cube_t, false, 3.103125 * 1e-6, true, 0.0 );
+	    const std::pair< UInt_t, double > pmt_pair = pmt_list.at(i_pmt);
+	    double emission_t = time_res_calc.CalcTimeResidual( pmt_pair.first, pmt_pair.second, cube_pos, cube_t, false, 3.103125 * 1e-6, true, 0.0 );
 	
 	    if(emission_t > -cube_rad_t && emission_t < cube_rad_t){
 	      //// If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
 	      overlap++;
-	      pmt_list.push_back( pmt );
+	      pmt_list.push_back( pmt_pair );
 	    }
     }  //// End loop over hits
       
