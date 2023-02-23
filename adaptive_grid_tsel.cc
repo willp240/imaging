@@ -96,7 +96,8 @@ int main( int argc, char **argv ) {
 	}
 
   Cube4DCollection* init_cube_col = new Cube4DCollection;
-
+  std::cout << "xyz: " << min_xyz << " " << max_xyz << std::endl;
+  std::cout << "t: " << min_t << " " << max_t << std::endl;
   //// Let's loop over t slices
   for(double t = min_t + init_cube_rad_t; t < max_t; t += 2*init_cube_rad_t){
     std::cout << "Doing time " << t << std::endl;
@@ -231,9 +232,8 @@ double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::
     //// Now loop over hits
     std::vector< std::pair< UInt_t, double > > pmts = cub->GetPMTs();
     for( size_t i_pmt = 0; i_pmt < pmts.size(); i_pmt++ ) {
-
 	    //// Loop PMTs & get LLH
-	    const std::pair< UInt_t, double > pmt_pair = pmt_list.at(i_pmt);
+	    const std::pair< UInt_t, double > pmt_pair = pmts.at(i_pmt);
 	    double emission_t = time_res_calc.CalcTimeResidual( pmt_pair.first, pmt_pair.second, cube_pos, cube_t, false, 3.103125 * 1e-6, true, 0.0 );
 	
 	    if(emission_t > -cube_rad_t && emission_t < cube_rad_t){
