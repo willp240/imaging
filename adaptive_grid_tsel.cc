@@ -71,7 +71,7 @@ int main( int argc, char **argv ) {
   for(int i=0; i<num_t; i++){
     TString hname = Form("h_%d",i);
     TString htitle = Form("h_%f", min_t + 2*init_cube_rad_t*i);
-    hists[i] = new TH3D( hname, hname, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
+    hists[i] = new TH3D( hname, htitle, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
     hists[i]->GetXaxis()->SetTitle("X, mm  ");
     hists[i]->GetXaxis()->SetTitleOffset(1.5);
     hists[i]->GetYaxis()->SetTitle("Y, mm");
