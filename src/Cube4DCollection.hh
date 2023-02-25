@@ -28,6 +28,10 @@ class Cube4DCollection{
   int GetMaxLLHCube();
   void SetPMTs( std::vector< std::pair< UInt_t, double > > pmts_ );
   std::vector< std::pair< UInt_t, double > > GetPMTs() { return fPMTs; }
+  void SetT( double t_ );
+  double GetT() { return fT; }
+  void SetTRadius( double trad_ );
+  double GetTRadius() { return fTRadius; }
   void SortByOverlap();
   void RemoveRepeatedPMTs();
   void RemovePMTs( std::vector< std::pair< UInt_t, double > > pmts );
@@ -38,6 +42,8 @@ class Cube4DCollection{
   double fMaxLLH;
   int fMaxLLHCube;
   std::vector<std::pair< UInt_t, double > > fPMTs;
+  double fT;
+  double fTRadius;
 
 };
 #endif // __CUBE4DCOLLECTION__

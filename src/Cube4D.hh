@@ -18,8 +18,8 @@ class Cube4DCollection;
 class Cube4D{
 
   public:
-  Cube4D( double x_, double y_, double z_, double radius_, double t_, double tradius_ )
-    : fX(x_), fY(y_), fZ(z_), fRadius(radius_), fT(t_), fTRadius(tradius_) {}
+  Cube4D( double x_, double y_, double z_, double radius_ )
+    : fX(x_), fY(y_), fZ(z_), fRadius(radius_) {}
 
   Cube4D(){};
 

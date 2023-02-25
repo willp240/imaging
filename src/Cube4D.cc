@@ -9,26 +9,21 @@ Cube4DCollection* Cube4D::Divide( int factor ){
   double x_min = fX - fRadius;
   double y_min = fY - fRadius;
   double z_min = fZ - fRadius;
-  double t_min = fT - fTRadius;
-  double new_radius_t = fTRadius/factor;
 
-  for(int i_t = 1; i_t <= 2*factor; i_t += 2) {
-    for(int i_x = 1; i_x <= 2*factor; i_x += 2) {
-      for(int i_y = 1; i_y <= 2*factor; i_y += 2) {
-        for(int i_z = 1; i_z <= 2*factor; i_z += 2 ) {
+  for(int i_x = 1; i_x <= 2*factor; i_x += 2) {
+    for(int i_y = 1; i_y <= 2*factor; i_y += 2) {
+      for(int i_z = 1; i_z <= 2*factor; i_z += 2 ) {
 
-  	      double x = x_min + i_x*new_radius;
-	        double y = y_min + i_y*new_radius;
-	        double z = z_min + i_z*new_radius;
-          double t = t_min + i_t*new_radius_t;
+  	    double x = x_min + i_x*new_radius;
+	      double y = y_min + i_y*new_radius;
+	      double z = z_min + i_z*new_radius;
 
-	        if( sqrt(x*x+y*y+z*z) > 5500 )
-	          continue;
+	      if( sqrt(x*x+y*y+z*z) > 5500 )
+	        continue;
 
-        	Cube4D* new_cube = new Cube4D( x, y, z, new_radius, t, new_radius_t );
-	        col->AddCube( new_cube );
-       }
-     }
+        Cube4D* new_cube = new Cube4D( x, y, z, new_radius, fT, fTRadius );
+	      col->AddCube( new_cube );
+      }
     }
   }
 

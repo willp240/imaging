@@ -12,6 +12,28 @@ void Cube4DCollection::SetPMTs( std::vector<std::pair< UInt_t, double > > pmts_ 
 }
 
 
+void Cube4DCollection::SetT( double t_ ) {
+
+  fT = t_;
+
+  for( size_t i_cube = 0; i_cube < this->GetNCubes(); i_cube++) {
+    fCubeVec.at( i_cube )->SetT( fT );
+  }
+
+}
+
+
+void Cube4DCollection::SetTRadius( double trad_ ) {
+
+  fTRadius = trad_;
+
+  for( size_t i_cube = 0; i_cube < this->GetNCubes(); i_cube++) {
+    fCubeVec.at( i_cube )->SetT( fTRadius );
+  }
+
+}
+
+
 void Cube4DCollection::RemoveRepeatedPMTs( ) {
   
   this->SortByOverlap();
