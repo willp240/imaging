@@ -28,7 +28,7 @@ void Cube4DCollection::SetTRadius( double trad_ ) {
   fTRadius = trad_;
 
   for( size_t i_cube = 0; i_cube < this->GetNCubes(); i_cube++) {
-    fCubeVec.at( i_cube )->SetT( fTRadius );
+    fCubeVec.at( i_cube )->SetTRadius( fTRadius );
   }
 
 }

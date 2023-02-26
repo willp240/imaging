@@ -54,8 +54,8 @@ int main( int argc, char **argv ) {
   double min_t = fit_time - 2*init_cube_rad_t*(init_num_t/2);
   double max_t = fit_time + 2*init_cube_rad_t*(init_num_t/2);
 
-  double min_xyz = -5500;
-  double max_xyz = 5500;
+  double min_xyz = -3500;
+  double max_xyz = 3500;
   double init_cube_rad = 500;
   int    init_num_cubes = floor( ( max_xyz - min_xyz ) / 2*init_cube_rad );
 
@@ -139,6 +139,9 @@ int main( int argc, char **argv ) {
     //// Fill histogram for this time slice if we have some density
     if( overlap > 0 ){
       int hist_num = floor(cube_t - min_t);
+      if(hist_num >= num_t){
+        std::cout << "WARNING: calculated hist num " << hist_num << " setting to num_t" << std::endl;
+      }
       int bin_number = hists[hist_num]->FindBin(cube_x, cube_y, cube_z);
       if(overlap > hists[hist_num]->GetBinContent(bin_number));{
         std::cout << "Filling " << cube_x << " " << cube_y << " " << cube_z << " " << overlap << " " << cube_t << " " << hist_num << std::endl;
@@ -169,6 +172,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 
     Cube4DCollection* col = &*init_cube_col;
     col->SetT(t);
+    col->SetTRadius(init_cube_rad_t);
 
     double best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs );
 
