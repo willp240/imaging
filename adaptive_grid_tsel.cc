@@ -16,7 +16,7 @@
 #include <Cube4D.hh>
 #include <Cube4DCollection.hh>
 
-void AdapGrid( Cube4DCollection* col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, double min_t, double max_t, double init_cube_rad_t, double res, int factor );
+void AdapGrid( Cube4DCollection* col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor );
 
 double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs );
 
@@ -54,8 +54,8 @@ int main( int argc, char **argv ) {
   double min_t = fit_time - 2*init_cube_rad_t*(init_num_t/2);
   double max_t = fit_time + 2*init_cube_rad_t*(init_num_t/2);
 
-  double min_xyz = -3500;
-  double max_xyz = 3500;
+  double min_xyz = -5500;
+  double max_xyz = 5500;
   double init_cube_rad = 500;
   int    init_num_cubes = floor( ( max_xyz - min_xyz ) / 2*init_cube_rad );
 
@@ -124,7 +124,7 @@ int main( int argc, char **argv ) {
 
   //// Adaptive Grid on Cube Collection
   Cube4DCollection* final_cube_col = new Cube4DCollection();
-  AdapGrid( init_cube_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, min_t, max_t, init_cube_rad_t, res, factor );
+  AdapGrid( init_cube_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, min_t, max_t, init_cube_rad_t, res, factor );
 
   //// Now loop over cubes and fill histo
   for( int i_cube = 0; i_cube < final_cube_col->GetNCubes(); i_cube++ ){
@@ -165,7 +165,7 @@ int main( int argc, char **argv ) {
 
 
 //// Function to recursively perform the adaptive grid
-void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, double min_t, double max_t, double init_cube_rad_t, double res, int factor ) {
+void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor ) {
 
   for(double t = min_t + init_cube_rad_t; t < max_t; t += 2*init_cube_rad_t){ 
     std::cout << "Adap grid for " << t << std::endl;
@@ -173,6 +173,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
     Cube4DCollection* col = &*init_cube_col;
     col->SetT(t);
     col->SetTRadius(init_cube_rad_t);
+    col->SetPMTs(pmts);
 
     double best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs );
 
@@ -188,6 +189,8 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
       double cube_y = cub->GetY();
       double cube_z = cub->GetZ();
       double cube_r = cub->GetRadius();
+
+      //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetPMTs().size() << std::endl;
 
       //// If we're above the resolution, we might want to divide the cube into subcubes
       if( cube_r > res ){
@@ -208,7 +211,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 	        //std::cout << "\t end " << cube_x + cube_r <<" " << cube_y + cube_r << " " << cube_z + cube_r<< std::endl;	
 
 	        //// Rerun adaptive grid on new collection
-	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, new_min_t, new_max_t, new_rad_t, res, factor );
+	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor );
         }
       // std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
       }
