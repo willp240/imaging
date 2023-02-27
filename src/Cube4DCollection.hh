@@ -21,15 +21,7 @@ class Cube4DCollection{
   Cube4DCollection( ) {};
    ~Cube4DCollection();
 
-  Cube4DCollection(const Cube4DCollection &collection ){
-
-    fCubeVec = collection.GetCubeVec();
-    fPMTs = collection.GetPMTs();
-    fT = collection.GetT();
-    fTRadius = collection.GetTRadius();
-    
-  }
-
+  Cube4DCollection(const Cube4DCollection &collection );
 
   void AddCube( Cube4D* cube_ ) { fCubeVec.push_back( cube_ ); }
   std::vector<Cube4D*> GetCubeVec() const { return fCubeVec; }

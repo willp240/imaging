@@ -1,6 +1,19 @@
 #include <Cube4D.hh>
 #include <Cube4DCollection.hh>
 
+Cube4DCollection::Cube4DCollection( const Cube4DCollection &col ){
+
+  //    fCubeVec = collection.GetCubeVec();
+  for(int i_cube = 0; i_cube < col.GetCubeVec().size(); i_cube++){
+    Cube4D* cub = new Cube4D(*col.GetCube(i_cube));
+    fCubeVec.push_back(cub);
+  }
+  fPMTs = col.GetPMTs();
+  fT = col.GetT();
+  fTRadius = col.GetTRadius();
+
+}
+
 void Cube4DCollection::SetPMTs( std::vector<std::pair< UInt_t, double > > pmts_ ) {
 
   fPMTs = pmts_;
