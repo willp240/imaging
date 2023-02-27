@@ -66,21 +66,6 @@ int main( int argc, char **argv ) {
   int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / 100 );
   int    num_t = floor( ( max_t - min_t ) / 0.3 );
 
-  //// Gonna make some histograms
-  TH3D* hists[num_t];
-  for(int i=0; i<num_t; i++){
-    TString hname = Form("h_%d",i);
-    TString htitle = Form("h_%f", min_t + 2*init_cube_rad_t*i);
-    hists[i] = new TH3D( hname, htitle, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
-    hists[i]->GetXaxis()->SetTitle("X, mm  ");
-    hists[i]->GetXaxis()->SetTitleOffset(1.5);
-    hists[i]->GetYaxis()->SetTitle("Y, mm");
-    hists[i]->GetYaxis()->SetTitleOffset(2.0);
-    hists[i]->GetZaxis()->SetTitle("Z, mm");
-    hists[i]->GetZaxis()->SetTitleOffset(1.3);
-    hists[i]->SetLineWidth(0);
-  }
-
   std::cout << std::endl;
 
   //// Make vector of pmts to assign to each initial cube
@@ -126,6 +111,21 @@ int main( int argc, char **argv ) {
   Cube4DCollection* final_cube_col = new Cube4DCollection();
   AdapGrid( init_cube_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, min_t, max_t, init_cube_rad_t, res, factor );
 
+  //// Gonna make some histograms
+  TH3D* hists[num_t];
+  for(int i=0; i<num_t; i++){
+    TString hname = Form("h_%d",i);
+    TString htitle = Form("h_%f", min_t + 2*init_cube_rad_t*i);
+    hists[i] = new TH3D( hname, htitle, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
+    hists[i]->GetXaxis()->SetTitle("X, mm  ");
+    hists[i]->GetXaxis()->SetTitleOffset(1.5);
+    hists[i]->GetYaxis()->SetTitle("Y, mm");
+    hists[i]->GetYaxis()->SetTitleOffset(2.0);
+    hists[i]->GetZaxis()->SetTitle("Z, mm");
+    hists[i]->GetZaxis()->SetTitleOffset(1.3);
+    hists[i]->SetLineWidth(0);
+  }
+
   //// Now loop over cubes and fill histo
   for( int i_cube = 0; i_cube < final_cube_col->GetNCubes(); i_cube++ ){
 
@@ -135,12 +135,14 @@ int main( int argc, char **argv ) {
     double cube_z = cub->GetZ();
     double cube_t = cub->GetT();
     double overlap = cub->GetLLH();
-
+    //std::cout << "looping " << i_cube << " of " << final_cube_col->GetNCubes() << " " << cub->GetLLH() << std::endl;
+    //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cube_t << " " << overlap << std::endl; 
     //// Fill histogram for this time slice if we have some density
     if( overlap > 0 ){
-      int hist_num = floor(cube_t - min_t);
+      int hist_num = floor((cube_t - min_t)/3);
       if(hist_num >= num_t){
-        std::cout << "WARNING: calculated hist num " << hist_num << " setting to num_t" << std::endl;
+        std::cout << "WARNING: calculated hist num " << hist_num << " setting to" << num_t-1 << std::endl;
+        hist_num = num_t - 1;
       }
       int bin_number = hists[hist_num]->FindBin(cube_x, cube_y, cube_z);
       if(overlap > hists[hist_num]->GetBinContent(bin_number));{
@@ -150,8 +152,8 @@ int main( int argc, char **argv ) {
     }
   }
 
-  //delete final_cube_col;
-  //    delete init_cube_col;
+  delete final_cube_col;
+  delete init_cube_col;
 
   //// Write all histograms to file
   TFile *out_file = TFile::Open( out_fname.c_str(), "RECREATE");
@@ -170,7 +172,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
   for(double t = min_t + init_cube_rad_t; t < max_t; t += 2*init_cube_rad_t){ 
     std::cout << "Adap grid for " << t << std::endl;
 
-    Cube4DCollection* col = &*init_cube_col;
+    Cube4DCollection* col = new Cube4DCollection(*init_cube_col);
     col->SetT(t);
     col->SetTRadius(init_cube_rad_t);
     col->SetPMTs(pmts);
@@ -184,7 +186,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
     //// Loop Cubes
     for( int i_cube = 0; i_cube < col->GetNCubes(); i_cube++ ){
       // std::cout << "final loop " << i_cube << " out of " << col->GetNCubes() << std::endl;
-      Cube4D* cub = col->GetCube( i_cube );
+      Cube4D* cub = new Cube4D(*col->GetCube( i_cube ));
       double cube_x = cub->GetX();
       double cube_y = cub->GetY();
       double cube_z = cub->GetZ();
@@ -202,7 +204,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 	        //// Each new cube has same associated PMTs as the parent bigger cube
 	        new_col->SetPMTs( cub->GetPMTs() );
 	
-          double new_rad_t = init_cube_rad_t / factor;
+          double new_rad_t = 2*init_cube_rad_t / factor;
           double new_min_t = t - init_cube_rad_t;
           double new_max_t = t + init_cube_rad_t;
 
@@ -216,11 +218,11 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
       // std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
       }
       else { 
-        // std::cout << "Adding final cubes " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetRadius() << " " << res << std::endl;
+        //std::cout << "Adding final cubes " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetLLH() << std::endl;
         final_cube_col->AddCube( cub );
       }
    } //// End 2nd loop over cubes
-
+    delete col;
   } //// End loop over t
 }
 
@@ -257,7 +259,7 @@ double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::
 	    }
     }  //// End loop over hits
       
-    // std::cout << "Cube at " << cube_x << " " << cube_y << " " << cube_z << " overlap " << overlap << " at " << t_emit << std::endl;
+   // std::cout << "Cube at " << cube_x << " " << cube_y << " " << cube_z << " overlap " << overlap << " at " << cube_t << std::endl;
     
     //// Store overlap PMT IDs
     cub->SetLLH( overlap );
