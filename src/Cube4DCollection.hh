@@ -21,17 +21,26 @@ class Cube4DCollection{
   Cube4DCollection( ) {};
    ~Cube4DCollection();
 
+  Cube4DCollection(const Cube4DCollection &collection ){
+
+    fCubeVec = collection.GetCubeVec();
+    fPMTs = collection.GetPMTs();
+    fT = collection.GetT();
+    fTRadius = collection.GetTRadius();
+    
+  }
+
+
   void AddCube( Cube4D* cube_ ) { fCubeVec.push_back( cube_ ); }
-  Cube4D* GetCube( int i_ ) { return fCubeVec.at( i_ ); }
+  std::vector<Cube4D*> GetCubeVec() const { return fCubeVec; }
+  Cube4D* GetCube( int i_ ) const { return fCubeVec.at( i_ ); }
   int GetNCubes() { return fCubeVec.size(); }
-  double GetMaxLLH();
-  int GetMaxLLHCube();
   void SetPMTs( std::vector< std::pair< UInt_t, double > > pmts_ );
-  std::vector< std::pair< UInt_t, double > > GetPMTs() { return fPMTs; }
+  std::vector< std::pair< UInt_t, double > > GetPMTs() const { return fPMTs; }
   void SetT( double t_ );
-  double GetT() { return fT; }
+  double GetT() const { return fT; }
   void SetTRadius( double trad_ );
-  double GetTRadius() { return fTRadius; }
+  double GetTRadius() const { return fTRadius; }
   void SortByOverlap();
   void RemoveRepeatedPMTs();
   void RemovePMTs( std::vector< std::pair< UInt_t, double > > pmts );
@@ -39,8 +48,6 @@ class Cube4DCollection{
   private:
   ////// Cube Details
   std::vector<Cube4D*> fCubeVec;
-  double fMaxLLH;
-  int fMaxLLHCube;
   std::vector<std::pair< UInt_t, double > > fPMTs;
   double fT;
   double fTRadius;

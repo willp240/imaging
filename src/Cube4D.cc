@@ -21,7 +21,7 @@ Cube4DCollection* Cube4D::Divide( int factor ){
 	      if( sqrt(x*x+y*y+z*z) > 5500 )
 	        continue;
 
-        Cube4D* new_cube = new Cube4D( x, y, z, new_radius, fT, fTRadius );
+        Cube4D* new_cube = new Cube4D( x, y, z, new_radius );
 	      col->AddCube( new_cube );
       }
     }

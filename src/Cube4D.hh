@@ -23,6 +23,19 @@ class Cube4D{
 
   Cube4D(){};
 
+  Cube4D(const Cube4D &cube){
+
+    fX = cube.GetX();
+    fY = cube.GetY();
+    fZ = cube.GetZ();
+    fRadius = cube.GetRadius();
+    fT = cube.GetT();
+    fTRadius = cube.GetTRadius();
+    fLLH = cube.GetLLH();
+    fPMTs = cube.GetPMTs();
+
+  }
+
 
   void SetX( double x_ ) { fX = x_; }
   double GetX() const { return fX; }
