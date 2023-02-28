@@ -16,7 +16,7 @@
 #include <Cube4D.hh>
 #include <Cube4DCollection.hh>
 
-void AdapGrid( Cube4DCollection* col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor );
+void AdapGrid( Cube4DCollection* col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor, double hit_cut );
 
 double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs );
 
@@ -65,6 +65,7 @@ int main( int argc, char **argv ) {
   double factor = 10;
   int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / 100 );
   int    num_t = floor( ( max_t - min_t ) / 0.3 );
+  double hit_cut = 5000;
 
   std::cout << std::endl;
 
@@ -109,7 +110,7 @@ int main( int argc, char **argv ) {
 
   //// Adaptive Grid on Cube Collection
   Cube4DCollection* final_cube_col = new Cube4DCollection();
-  AdapGrid( init_cube_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, min_t, max_t, init_cube_rad_t, res, factor );
+  AdapGrid( init_cube_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, min_t, max_t, init_cube_rad_t, res, factor, hit_cut );
 
   //// Gonna make some histograms
   TH3D* hists[num_t];
@@ -139,7 +140,7 @@ int main( int argc, char **argv ) {
     //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cube_t << " " << overlap << std::endl; 
     //// Fill histogram for this time slice if we have some density
     if( overlap > 0 ){
-      int hist_num = floor((cube_t - min_t)/3);
+      int hist_num = floor((cube_t - min_t)/0.3);
       if(hist_num >= num_t){
         std::cout << "WARNING: calculated hist num " << hist_num << " setting to" << num_t-1 << std::endl;
         hist_num = num_t - 1;
@@ -167,7 +168,7 @@ int main( int argc, char **argv ) {
 
 
 //// Function to recursively perform the adaptive grid
-void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor ) {
+void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor, double hit_cut ) {
 
   for(double t = min_t + init_cube_rad_t; t < max_t; t += 2*init_cube_rad_t){ 
     std::cout << "Adap grid for " << t << std::endl;
@@ -195,7 +196,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
       //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetPMTs().size() << std::endl;
 
       //// If we're above the resolution, we might want to divide the cube into subcubes
-      if( cube_r > res ){
+      if( cube_r > res && best_global_overlap > hit_cut ){
       
         //// If llh > 50% best
         if( cub->GetLLH() > 0 ){ // 0.5*best_global_overlap ) {
@@ -213,7 +214,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 	        //std::cout << "\t end " << cube_x + cube_r <<" " << cube_y + cube_r << " " << cube_z + cube_r<< std::endl;	
 
 	        //// Rerun adaptive grid on new collection
-	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor );
+	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor, hit_cut/factor );
         }
       // std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
       }
