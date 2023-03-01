@@ -13,7 +13,7 @@ void PlotTHist(TString fname){
   TCanvas* c1 = new TCanvas("c1", "c1", 1000,800);
   c1->SetRightMargin(0.12);
 
-  c1->Print("test2.pdf[");
+  c1->Print("test_all.pdf[");
 
   TColor::InvertPalette();
 
@@ -29,25 +29,25 @@ void PlotTHist(TString fname){
     }
   }
 
-  for(int i=0; i<100; i++){
-
-    int t = i-50;
+  for(int i=0; i<320; i++){
 
     TString hname = Form("h_%d", i);
     std::cout << "getting " << hname << std::endl;
 
     TH3D* h = (TH3D*)f->Get(hname)->Clone();
 
-    double emitT = 276.524+t;
+    double emitT = 276.524 - 48 + 0.3*i;
+    //double emitT = 254 + t;
     TString htitle = Form("EmissionTime_%fns", emitT);
 
     std::cout << "got " << hname << std::endl;
     h->SetName(htitle);
     h->SetTitle(htitle);
+    //    h->SetMinimum(25);
     h->Draw("box2z");
     g->Draw("AP same");
-    c1->Print("test2.pdf");
+    c1->Print("test_all.pdf");
   }
   
-  c1->Print("test2.pdf]");
+  c1->Print("test_all.pdf]");
 }
