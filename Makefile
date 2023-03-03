@@ -1,4 +1,4 @@
-§CXX=g++ -std=c++11
+CXX=g++ -std=c++11
 ROOT_FLAGS=`root-config --cflags --glibs`
 CXX_OPTIONS= -O2 -std=c++11 -pedantic -Wall -Wextra
 RAT_ROOT = $(RATROOT)
@@ -18,7 +18,7 @@ LIB_NAME=img
 
 LIB=$(LIB_DIR)/lib$(LIB_NAME).a
 
-all: bin/adaptive_grid bin/adaptive_grid_noreducet bin/adaptive_grid_noreducepmt bin/adaptive_grid_pmtsel bin/adaptive_grid_tsel
+all: bin/adaptive_grid bin/adaptive_grid_noreducet bin/adaptive_grid_noreducepmt bin/adaptive_grid_pmtsel bin/adaptive_grid_tsel bin/adaptive_grid_tselb
 
 bin/adaptive_grid: adaptive_grid.cc $(LIB)
 	mkdir -p bin
@@ -40,6 +40,10 @@ bin/adaptive_grid_tsel: adaptive_grid_tsel.cc $(LIB)
 	mkdir -p bin
 	$(CXX) adaptive_grid_tsel.cc -I./ -I$(SRC_FILES) -I$(RAT_EXTRN_INC) -I$(RAT_INC) -I$(INC_DIR) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
 
+bin/adaptive_grid_tselb: adaptive_grid_tselb.cc $(LIB)
+		mkdir -p bin
+		$(CXX) adaptive_grid_tselb.cc -I./ -I$(SRC_FILES) -I$(RAT_EXTRN_INC) -I$(RAT_INC) -I$(INC_DIR) -w -L$(LIB_DIR) -L$(RAT_LIB_DIR) -l$(LIB_NAME) -l$(RAT_LIB_NAME) $(ROOT_FLAGS) -o $@
+
 $(LIB) : $(OBJ_FILES)
 	mkdir -p $(LIB_DIR)
 	ar rcs  $@ $^
@@ -55,4 +59,5 @@ clean:
 	rm -f bin/adaptive_grid_noreducepmt
 	rm -f bin/adaptive_grid_pmtsel
 	rm -f bin/adaptive_grid_tsel
+	rm -f bin/adaptive_grid_tselb
 	rm -f lib/*

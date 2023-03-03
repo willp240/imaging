@@ -13,7 +13,7 @@ void PlotAll(TString fname){
   c1->Divide(6,5);
 
   double maxint = -999;
-  int maxt;
+  int maxt = 0;
   
   for(int i=0; i<30; i++){
 

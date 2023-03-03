@@ -1,4 +1,4 @@
-export IMAGING_ROOT="/path/to/imaging/directory"
-export DATA_ROOT="/path/to/data/directory"
-export ENV_FILE="/path/to/environment/file" # whatever you use for setting up RAT basically
-export RATROOT="/path/to/RAT"
+export IMAGING_ROOT="/home/parkerw/Software/imaging_gh"
+export DATA_ROOT="/data/snoplus3/parkerw/imaging/"
+export ENV_FILE="/home/parkerw/Software/env-dev.sh"
+export RATROOT="/home/parkerw/Software/rat_root6"

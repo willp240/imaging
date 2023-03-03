@@ -16,7 +16,7 @@
 #include <Cube4D.hh>
 #include <Cube4DCollection.hh>
 
-void AdapGrid( Cube4DCollection* col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor, double hit_cut );
+void AdapGrid( Cube4DCollection* col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, double min_t, double max_t, double init_cube_rad_t, double res, int factor );
 
 double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs );
 
@@ -65,8 +65,7 @@ int main( int argc, char **argv ) {
   double factor = 10;
   int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / 100 );
   int    num_t = floor( ( max_t - min_t ) / 0.3 );
-  double hit_cut = 300;
-
+  
   std::cout << std::endl;
 
   //// Make vector of pmts to assign to each initial cube
@@ -110,24 +109,25 @@ int main( int argc, char **argv ) {
 
   //// Adaptive Grid on Cube Collection
   Cube4DCollection* final_cube_col = new Cube4DCollection();
-  AdapGrid( init_cube_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, min_t, max_t, init_cube_rad_t, res, factor, hit_cut );
+  AdapGrid( init_cube_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, min_t, max_t, init_cube_rad_t, res, factor );
 
   //// Gonna make some histograms
-  TH3D* hists[num_t];
+  //TH3D* hists[num_t];
+  std::vector <TH3D*> hists;
   for(int i=0; i<num_t; i++){
     TString hname = Form("h_%d",i);
     TString htitle = Form("h_%f", min_t + 2*init_cube_rad_t*i);
-    hists[i] = new TH3D( hname, htitle, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
-    hists[i]->GetXaxis()->SetTitle("X, mm  ");
-    hists[i]->GetXaxis()->SetTitleOffset(1.5);
-    hists[i]->GetYaxis()->SetTitle("Y, mm");
-    hists[i]->GetYaxis()->SetTitleOffset(2.0);
-    hists[i]->GetZaxis()->SetTitle("Z, mm");
-    hists[i]->GetZaxis()->SetTitleOffset(1.3);
-    hists[i]->SetLineWidth(0);
+    TH3D*h = new TH3D( hname, hname, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
+    h->GetXaxis()->SetTitle("X, mm  ");
+    h->GetXaxis()->SetTitleOffset(1.5);
+    h->GetYaxis()->SetTitle("Y, mm");
+    h->GetYaxis()->SetTitleOffset(2.0);
+    h->GetZaxis()->SetTitle("Z, mm");
+    h->GetZaxis()->SetTitleOffset(1.3);
+    h->SetLineWidth(0);
+    hists.push_back(h);
   }
-  
-  std::cout << std::endl;
+
   //// Now loop over cubes and fill histo
   for( int i_cube = 0; i_cube < final_cube_col->GetNCubes(); i_cube++ ){
 
@@ -137,31 +137,27 @@ int main( int argc, char **argv ) {
     double cube_z = cub->GetZ();
     double cube_t = cub->GetT();
     double overlap = cub->GetLLH();
-    //std::cout << "looping " << i_cube << " of " << final_cube_col->GetNCubes() << " " << cub->GetLLH() << std::endl;
-    //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cube_t << " " << overlap << std::endl; 
+
     //// Fill histogram for this time slice if we have some density
     if( overlap > 0 ){
-      int hist_num = floor((cube_t - min_t)/0.3);
-      if(hist_num >= num_t){
-        std::cout << "WARNING: calculated hist num " << hist_num << " setting to" << num_t-1 << std::endl;
-        hist_num = num_t - 1;
-      }
-      int bin_number = hists[hist_num]->FindBin(cube_x, cube_y, cube_z);
-      if(overlap > hists[hist_num]->GetBinContent(bin_number));{
+      int hist_num = floor(cube_t - min_t);
+      int bin_number = hists.at(hist_num)->FindBin(cube_x, cube_y, cube_z);
+      // Calc t here to find bin, then fill that one
+      if(overlap > hists.at(hist_num)->GetBinContent(bin_number));{
         std::cout << "Filling " << cube_x << " " << cube_y << " " << cube_z << " " << overlap << " " << cube_t << " " << hist_num << std::endl;
-        hists[hist_num]->SetBinContent( bin_number, overlap );
+        hists.at(hist_num)->SetBinContent( bin_number, overlap );
       }
     }
   }
 
-  delete final_cube_col;
-  delete init_cube_col;
+  //delete final_cube_col; 
+  //delete init_cube_col;
 
   //// Write all histograms to file
   TFile *out_file = TFile::Open( out_fname.c_str(), "RECREATE");
   for(int i=0; i<num_t; i++){
-    hists[i]->Write();
-    std::cout << hists[i]->Integral() << std::endl;
+    hists.at(i)->Write();
+    std::cout << hists.at(i)->Integral() << std::endl;
   }
 
   out_file->Close();
@@ -169,36 +165,32 @@ int main( int argc, char **argv ) {
 
 
 //// Function to recursively perform the adaptive grid
-void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, std::vector< std::pair < UInt_t, double > > pmts, double min_t, double max_t, double init_cube_rad_t, double res, int factor, double hit_cut ) {
+void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, double min_t, double max_t, double init_cube_rad_t, double res, int factor ) {
 
-  for(double t = min_t + init_cube_rad_t; t < max_t; t += 2*init_cube_rad_t){
-    //std::cout << std::endl;
-    //std::cout << "Adap grid for " << t << std::endl;
+  for(double t = min_t + init_cube_rad_t; t < max_t; t += 2*init_cube_rad_t){ 
+    std::cout << "Adap grid for " << t << std::endl;
 
-    Cube4DCollection* col = new Cube4DCollection(*init_cube_col);
+    Cube4DCollection* col = &*init_cube_col;
     col->SetT(t);
     col->SetTRadius(init_cube_rad_t);
-    col->SetPMTs(pmts);
 
     double best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs );
 
     col->RemoveRepeatedPMTs();
 
     best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs );
-    //std::cout << "Best Global Overlap " << best_global_overlap << std::endl;
+
     //// Loop Cubes
     for( int i_cube = 0; i_cube < col->GetNCubes(); i_cube++ ){
       // std::cout << "final loop " << i_cube << " out of " << col->GetNCubes() << std::endl;
-      Cube4D* cub = new Cube4D(*col->GetCube( i_cube ));
+      Cube4D* cub = col->GetCube( i_cube );
       double cube_x = cub->GetX();
       double cube_y = cub->GetY();
       double cube_z = cub->GetZ();
       double cube_r = cub->GetRadius();
 
-      //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetPMTs().size() << " " << cub->GetT() << " " << std::endl;
-
       //// If we're above the resolution, we might want to divide the cube into subcubes
-      if( cube_r > res && best_global_overlap > hit_cut ){
+      if( cube_r > res ){
       
         //// If llh > 50% best
         if( cub->GetLLH() > 0 ){ // 0.5*best_global_overlap ) {
@@ -216,16 +208,16 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 	        //std::cout << "\t end " << cube_x + cube_r <<" " << cube_y + cube_r << " " << cube_z + cube_r<< std::endl;	
 
 	        //// Rerun adaptive grid on new collection
-	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor, hit_cut/(factor) );
+	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, new_min_t, new_max_t, new_rad_t, res, factor );
         }
       // std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
       }
       else { 
-        //std::cout << "Adding final cubes " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetLLH() << std::endl;
+        // std::cout << "Adding final cubes " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetRadius() << " " << res << std::endl;
         final_cube_col->AddCube( cub );
       }
    } //// End 2nd loop over cubes
-    delete col;
+
   } //// End loop over t
 }
 
@@ -262,7 +254,7 @@ double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::
 	    }
     }  //// End loop over hits
       
-   // std::cout << "Cube at " << cube_x << " " << cube_y << " " << cube_z << " overlap " << overlap << " at " << cube_t << std::endl;
+    // std::cout << "Cube at " << cube_x << " " << cube_y << " " << cube_z << " overlap " << overlap << " at " << t_emit << std::endl;
     
     //// Store overlap PMT IDs
     cub->SetLLH( overlap );
