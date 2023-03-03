@@ -65,7 +65,7 @@ int main( int argc, char **argv ) {
   double factor = 10;
   int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / 100 );
   int    num_t = floor( ( max_t - min_t ) / 0.3 );
-  double hit_cut = 5000;
+  double hit_cut = 2000;
 
   std::cout << std::endl;
 
@@ -214,7 +214,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 	        //std::cout << "\t end " << cube_x + cube_r <<" " << cube_y + cube_r << " " << cube_z + cube_r<< std::endl;	
 
 	        //// Rerun adaptive grid on new collection
-	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor, hit_cut/factor );
+	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor, hit_cut/(10*factor) );
         }
       // std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
       }
