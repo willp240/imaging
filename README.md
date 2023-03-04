@@ -4,28 +4,24 @@ Code for attempts at imaging events in SNO+
 To setup, first clone this repository
 
 Then edit env.sh to point to your specific directories. $IMAGING_ROOT is the directory you've just cloned into. $DATA_ROOT is where you want things to get written to (subdirectories below this will be created if using the condor batch script supplied).
-You can also specify another environment files to get called when submitting jobs to batch systems. This should set your ROOT and everything else needed for RAT. Then you also specify your $RATROOT. $RATROOT/env.sh gets sourced when using the submission script.
+You can also specify another environment file to get called when submitting jobs to batch systems. This should set your ROOT and everything else needed for RAT. Then you also specify your $RATROOT. $RATROOT/env.sh gets sourced when using the submission script.
 
 Then, to build, simply run:
 
 make
 
 
-Currently there are five executables, "imaging", "imaging_alg2", "mcmc", "mcmc_fixedT, and "adaptive_grid". The two most useful (and developed) are probably "imaging_alg2" and "adaptive_grid". They can be ran for example by:
+Currently there are several apps which use various implementations of the adaptive grid method to search over possible emission times/positions. These are still being frequently updated and refined. More documentation will be written when these are more settled. To run, do something like:
 
-> ./bin/imaging /path/to/input/file /path/to/output/file
+> ./bin/adaptive_grid_tsel /path/to/input/file /path/to/output/file
 
 There are a few scripts setup for submitting to the Oxford batch machines with Condor. Run with:
 
-> python /submission/submitCondor.py imaging /path/to/input/file jobname
-
-or
-
-> python /submission/submitNoArgs.py adaptive_grid /path/to/input/file jobname
+> python /submission/submitNoArgs.py adaptive_grid_tsel /path/to/input/file jobname
 
 The ouput file will be written to $DATA_ROOT/jobname/jobname.root. Logs, output, errors, and the submission files will be written to $DATA_ROOT/jobname/log/jobname.log, $DATA_ROOT/jobname/output/jobname.output, $DATA_ROOT/jobname/error/jobname.error, $DATA_ROOT/jobname/submit/jobname.submit and $DATA_ROOT/jobname/sh/jobname.sh.
 
-
+The following is outdated and will updated
 imaging.cc:
 The only app currently written is imaging.cc. This is still slightly hardcoded for specific file with a muon starting at (0,0,8500)mm going in the (0,0,-1) direction. This will be generalised in the future.
 
