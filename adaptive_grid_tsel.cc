@@ -49,10 +49,11 @@ int main( int argc, char **argv ) {
   RAT::DS::CalPMTs calibrated_PMTs = r_Ev.GetCalPMTs();
 
   //// Set up the #cube
-  int    init_num_t = 32;
+  int    init_num_t_above = 16;
+  int    init_num_t_below = 3;
   double init_cube_rad_t = 1.5;
-  double min_t = fit_time - 2*init_cube_rad_t*(init_num_t/2);
-  double max_t = fit_time + 2*init_cube_rad_t*(init_num_t/2);
+  double min_t = fit_time - 2*init_cube_rad_t*(init_num_t_below);
+  double max_t = fit_time + 2*init_cube_rad_t*(init_num_t_above);
 
   double min_xyz = -5500;
   double max_xyz = 5500;
@@ -148,7 +149,7 @@ int main( int argc, char **argv ) {
       }
       int bin_number = hists[hist_num]->FindBin(cube_x, cube_y, cube_z);
       if(overlap > hists[hist_num]->GetBinContent(bin_number));{
-        std::cout << "Filling " << cube_x << " " << cube_y << " " << cube_z << " " << overlap << " " << cube_t << " " << hist_num << std::endl;
+        //std::cout << "Filling " << cube_x << " " << cube_y << " " << cube_z << " " << overlap << " " << cube_t << " " << hist_num << std::endl;
         hists[hist_num]->SetBinContent( bin_number, overlap );
       }
     }
@@ -173,7 +174,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 
   for(double t = min_t + init_cube_rad_t; t < max_t; t += 2*init_cube_rad_t){
     //std::cout << std::endl;
-    //std::cout << "Adap grid for " << t << std::endl;
+    std::cout << "Adap grid for " << t << std::endl;
 
     Cube4DCollection* col = new Cube4DCollection(*init_cube_col);
     col->SetT(t);
@@ -185,7 +186,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
     col->RemoveRepeatedPMTs();
 
     best_global_overlap = CalcOverlap( col, pmt_info, time_res_calc, calibrated_PMTs );
-    //std::cout << "Best Global Overlap " << best_global_overlap << std::endl;
+    std::cout << "Best Global Overlap " << best_global_overlap << std::endl;
     //// Loop Cubes
     for( int i_cube = 0; i_cube < col->GetNCubes(); i_cube++ ){
       // std::cout << "final loop " << i_cube << " out of " << col->GetNCubes() << std::endl;
@@ -211,7 +212,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
           double new_min_t = t - init_cube_rad_t;
           double new_max_t = t + init_cube_rad_t;
 
-	        std::cout << "Dividing cube " << cube_x << " " << cube_y << " " << cube_z << std::endl;
+	        std::cout << std::endl << "Dividing cube " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetLLH() << " " << factor << std::endl;
 	        //std::cout << "\t starts " << cube_x - cube_r << " " << cube_y - cube_r << " " << cube_z - cube_r << std::endl;
 	        //std::cout << "\t end " << cube_x + cube_r <<" " << cube_y + cube_r << " " << cube_z + cube_r<< std::endl;	
 
