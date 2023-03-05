@@ -202,7 +202,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
       if( cube_r > res && best_global_overlap > hit_cut ){
       
         //// If llh > 50% best
-        if( cub->GetLLH() > 0 ){ // 0.5*best_global_overlap ) {
+        if( cub->GetLLH() > hit_cut ){ // 0.5*best_global_overlap ) {
 	        Cube4DCollection* new_col = cub->Divide( factor );
 
 	        //// Each new cube has same associated PMTs as the parent bigger cube
