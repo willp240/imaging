@@ -59,13 +59,15 @@ int main( int argc, char **argv ) {
   double max_xyz = 5500;
   double init_cube_rad = 500;
   int    init_num_cubes = floor( ( max_xyz - min_xyz ) / 2*init_cube_rad );
+  double cube_min_rad_t = 0.3;
+  double cube_min_rad = 100;
 
 
   //// Adaptive grid parameters
   double res = 150;
   double factor = 10;
-  int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / 100 );
-  int    num_t = floor( ( max_t - min_t ) / 0.3 );
+  int    num_mini_cubes = floor( ( max_xyz - min_xyz ) / cube_min_rad );
+  int    num_t = floor( ( max_t - min_t ) / cube_min_rad_t );
   double hit_cut = 300;
 
   std::cout << std::endl;
@@ -117,7 +119,7 @@ int main( int argc, char **argv ) {
   TH3D* hists[num_t];
   for(int i=0; i<num_t; i++){
     TString hname = Form("h_%d",i);
-    TString htitle = Form("h_%f", min_t + 2*init_cube_rad_t*i);
+    TString htitle = Form("h_%f", min_t + 2*cube_min_rad*i);
     hists[i] = new TH3D( hname, htitle, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
     hists[i]->GetXaxis()->SetTitle("X, mm  ");
     hists[i]->GetXaxis()->SetTitleOffset(1.5);
