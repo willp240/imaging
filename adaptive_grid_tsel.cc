@@ -144,7 +144,7 @@ int main( int argc, char **argv ) {
     //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cube_t << " " << overlap << std::endl; 
     //// Fill histogram for this time slice if we have some density
     if( overlap > 0 ){
-      int hist_num = floor((cube_t - min_t)/0.3);
+      int hist_num = floor((cube_t - min_t)/0.3) + 1;
       if(hist_num >= num_t){
         std::cout << "WARNING: calculated hist num " << hist_num << " setting to" << num_t-1 << std::endl;
         hist_num = num_t - 1;
