@@ -22,9 +22,10 @@ void BestTandLLH(TString fname){
   for(int i=0; i<190; i++){
 
     //int t = i-40;
-    double t = 276.524 - 9 + 0.3*i;
+    //double t = 276.524 - 9 + 0.3*i;
     //double t = 255.837 - 9 + 0.3*i;
-    //double n = 236.524347 + 80*i;
+    double t = 257.86 - 9 + 0.3*i;
+    //double t = 264.811 - 9 + 0.3*i;
     //double n = 3180.681152 + 80*i;
 
     TString hname = Form("h_%d", i);
@@ -50,6 +51,14 @@ void BestTandLLH(TString fname){
     for(int j=0; j<h->GetXaxis()->GetNbins(); j++){
       for(int k=0; k<h->GetYaxis()->GetNbins(); k++){
       	for(int l=0; l<h->GetZaxis()->GetNbins(); l++){
+
+          double x = h->GetXaxis()->GetBinCenter(j);
+          double y = h->GetYaxis()->GetBinCenter(k);
+          double z = h->GetZaxis()->GetBinCenter(l);
+
+          if(sqrt(x*x + y*y + z*z) > 5500)
+            continue;
+
 	        if(h->GetBinContent(j, k, l) > h_llh->GetBinContent(j, k, l)){
 	          if(h->GetBinContent(j, k, l) > 0.9*max){
               h_llh->SetBinContent(j, k, l, h->GetBinContent(j,k,l));
@@ -100,7 +109,7 @@ void BestTandLLH(TString fname){
   h_llh->Draw("box2Z");
   g->Draw("AP same");
 
-  TFile fout("output1mu.root","RECREATE");
+  TFile fout("output1mu_no_scatt_refl_reem.root","RECREATE");
   h_t->Write("h_t");
   h_llh->Write("h_llh");
   c1->Write("c_t");
