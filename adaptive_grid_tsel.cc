@@ -51,15 +51,15 @@ int main( int argc, char **argv ) {
   //// Set up the #cube
   int    init_num_t_above = 16;
   int    init_num_t_below = 3;
-  double init_cube_rad_t = 1.5;
+  double init_cube_rad_t = 0.75;
   double min_t = fit_time - 2*init_cube_rad_t*(init_num_t_below);
   double max_t = fit_time + 2*init_cube_rad_t*(init_num_t_above);
 
   double min_xyz = -5500;
   double max_xyz = 5500;
-  double init_cube_rad = 500;
+  double init_cube_rad = 250;
   int    init_num_cubes = floor( ( max_xyz - min_xyz ) / 2*init_cube_rad );
-  double cube_min_rad_t = 0.3;
+  double cube_min_rad_t = 0.15;
   double cube_min_rad = 100;
 
 
