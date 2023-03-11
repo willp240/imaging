@@ -60,7 +60,7 @@ int main( int argc, char **argv ) {
   double init_cube_rad = 250;
   int    init_num_cubes = floor( ( max_xyz - min_xyz ) / 2*init_cube_rad );
   double cube_min_rad_t = 0.15;
-  double cube_min_rad = 100;
+  double cube_min_rad = 50;
 
 
   //// Adaptive grid parameters
