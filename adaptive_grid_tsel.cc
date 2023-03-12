@@ -49,8 +49,8 @@ int main( int argc, char **argv ) {
   RAT::DS::CalPMTs calibrated_PMTs = r_Ev.GetCalPMTs();
 
   //// Set up the #cube
-  int    init_num_t_above = 16;
-  int    init_num_t_below = 3;
+  int    init_num_t_above = 32;
+  int    init_num_t_below = 6;
   double init_cube_rad_t = 0.75;
   double min_t = fit_time - 2*init_cube_rad_t*(init_num_t_below);
   double max_t = fit_time + 2*init_cube_rad_t*(init_num_t_above);
