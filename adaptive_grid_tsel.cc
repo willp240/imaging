@@ -102,7 +102,7 @@ int main( int argc, char **argv ) {
 	      //// Get PMTs associated with the cube (at this point, all hit PMTs)
 	      cub->SetPMTs( pmts );
 
-	      // std::cout << "Adding initial cube at " << x << " " << y << " " << z << std::endl;
+	      //std::cout << "Adding initial cube at " << x << " " << y << " " << z << std::endl;
 
 	      //// Add it to collection
 	      init_cube_col->AddCube( cub );
@@ -119,7 +119,7 @@ int main( int argc, char **argv ) {
   TH3D* hists[num_t];
   for(int i=0; i<num_t; i++){
     TString hname = Form("h_%d",i);
-    TString htitle = Form("h_%f", min_t + 2*cube_min_rad*i);
+    TString htitle = Form("h_%f", min_t + 2*cube_min_rad_t*i);
     hists[i] = new TH3D( hname, htitle, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz, num_mini_cubes, min_xyz, max_xyz );
     hists[i]->GetXaxis()->SetTitle("X, mm  ");
     hists[i]->GetXaxis()->SetTitleOffset(1.5);
@@ -144,7 +144,7 @@ int main( int argc, char **argv ) {
     //std::cout << cube_x << " " << cube_y << " " << cube_z << " " << cube_t << " " << overlap << std::endl; 
     //// Fill histogram for this time slice if we have some density
     if( overlap > 0 ){
-      int hist_num = floor((cube_t - min_t)/0.3) + 1;
+      int hist_num = floor((cube_t - min_t)/cube_min_rad_t) + 1;
       if(hist_num >= num_t){
         std::cout << "WARNING: calculated hist num " << hist_num << " setting to" << num_t-1 << std::endl;
         hist_num = num_t - 1;
