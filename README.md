@@ -8,7 +8,7 @@ You can also specify another environment file to get called when submitting jobs
 
 Then, to build, simply run:
 
-make
+> make
 
 
 Currently there are several apps which use various implementations of the adaptive grid method to search over possible emission times/positions. These are still being frequently updated and refined. More documentation will be written when these are more settled. To run, do something like:
