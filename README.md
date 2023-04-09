@@ -70,7 +70,7 @@ Run as:
 > 
 > Plot1("outputtedFileName.root", timeOffset)
 
-"BestTandLLH.cpp" is intended for use with the output of imaging_alg2.cc. It makes two TH3Ds, containing the best LLH and corresponding emission time for each position.
+"BestTandLLH.cpp" is intended for use with the output of imaging_alg2.cc. It makes two TH3Ds, containing the best LLH and corresponding emission time for each position. This can also be used on the output of the adaptive grid apps
 
 "ConvertHist.cpp" was used for converting between histograms with each bin filled, and having only every tenth bin filled (to try and see in 3d better)
 
