@@ -24,7 +24,8 @@ void BestTandLLH(TString fname){
     //int t = i-40;
     //double t = 276.524 - 9 + 0.3*i;
     //double t = 255.837 - 9 + 0.3*i;
-    double t = 257.86 - 9 + 0.3*i;
+    //    double t = 257.86 - 9 + 0.3*i;
+    double t = 226.861 + 0.3*i;
     //double t = 264.811 - 9 + 0.3*i;
     //double n = 3180.681152 + 80*i;
 
@@ -60,7 +61,7 @@ void BestTandLLH(TString fname){
             continue;
 
 	        if(h->GetBinContent(j, k, l) > h_llh->GetBinContent(j, k, l)){
-	          if(h->GetBinContent(j, k, l) > 0.9*max){
+	          if(h->GetBinContent(j, k, l) > 0.99*max){
               h_llh->SetBinContent(j, k, l, h->GetBinContent(j,k,l));
 	            h_t->SetBinContent(j, k, l, t);
             }
@@ -92,7 +93,7 @@ void BestTandLLH(TString fname){
   palette->SetY1NDC(0.22);
   palette->SetY2NDC(0.82);
   gPad->Update();
-  h_t->SetMinimum(250);
+  h_t->SetMinimum(200);
   h_t->Draw("box2Z");
   g->Draw("AP same");
 
@@ -109,7 +110,7 @@ void BestTandLLH(TString fname){
   h_llh->Draw("box2Z");
   g->Draw("AP same");
 
-  TFile fout("output1mu_no_scatt_refl_reem.root","RECREATE");
+  TFile fout("output1m_3m_.99.root","RECREATE");
   h_t->Write("h_t");
   h_llh->Write("h_llh");
   c1->Write("c_t");
