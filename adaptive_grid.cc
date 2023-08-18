@@ -12,9 +12,12 @@
 #include <RAT/DS/Entry.hh>
 #include <RAT/DS/MC.hh>
 #include <RAT/DB.hh>
+#include <RAT/DU/Point3D.hh>
 
 #include <Cube.hh>
 #include <CubeCollection.hh>
+
+size_t fAVSystemId = RAT::DU::Point3D::GetSystemId("av");
 
 void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, int num_t, double init_cube_size_t, double min_t, double t_res, double res, int factor );
 
@@ -34,6 +37,8 @@ int main( int argc, char **argv ) {
   //// RAT begin of runs etc
   RAT::DU::PMTInfo pmt_info = RAT::DU::Utility::Get()->GetPMTInfo();
   RAT::DU::TimeResidualCalculator time_res_calc = RAT::DU::Utility::Get()->GetTimeResidualCalculator();
+  RAT::DU::Point3D::BeginOfRun();
+  fAVSystemId = RAT::DU::Point3D::GetSystemId("av");
 
   // Get event and fit vertex
   const RAT::DS::Entry& r_DS = ds_reader.GetEntry( 0 );
@@ -167,15 +172,16 @@ void AdapGrid( CubeCollection* col, CubeCollection* &final_cube_col, RAT::DU::PM
       std::vector< RAT::DS::PMTCal > pmts = cub->GetPMTs();
       for( size_t i_pmt = 0; i_pmt < pmts.size(); i_pmt++ ) {
 
-	// Loop PMTs & get LLH
-	const RAT::DS::PMTCal pmt = pmts.at( i_pmt );
-	double emission_t = time_res_calc.CalcTimeResidual( pmt.GetID(), pmt.GetTime(), cube_pos, cube_t, false, 3.103125 * 1e-6, true, 0.0 );
+	      // Loop PMTs & get LLH
+	      const RAT::DS::PMTCal pmt = pmts.at( i_pmt );
+        RAT::DU::Point3D cubePos(fAVSystemId, cube_pos);
+	      double emission_t = time_res_calc.CalcTimeResidual( pmt.GetID(), pmt.GetTime(), cubePos, cube_t, false, 3.103125 * 1e-6, true, 0.0, false, 800 );
 
-	if(emission_t > -t_res && emission_t < t_res){
-	  // If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
-	  overlap++;
-	  pmt_list.push_back( pmt );
-	}
+	      if(emission_t > -t_res && emission_t < t_res){
+	        // If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
+	        overlap++;
+	        pmt_list.push_back( pmt );
+	      }
       
       }  // End loop over hits
       

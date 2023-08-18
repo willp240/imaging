@@ -12,9 +12,12 @@
 #include <RAT/DS/Entry.hh>
 #include <RAT/DS/MC.hh>
 #include <RAT/DB.hh>
+#include <RAT/DU/Point3D.hh>
 
 #include <Cube4D.hh>
 #include <Cube4DCollection.hh>
+
+size_t fAVSystemId = RAT::DU::Point3D::GetSystemId("av");
 
 void AdapGrid( Cube4DCollection* col, Cube4DCollection* &final_cube_col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs, double min_t, double max_t, double init_cube_rad_t, double res, int factor );
 
@@ -36,6 +39,8 @@ int main( int argc, char **argv ) {
   //// RAT begin of runs etc
   RAT::DU::PMTInfo pmt_info = RAT::DU::Utility::Get()->GetPMTInfo();
   RAT::DU::TimeResidualCalculator time_res_calc = RAT::DU::Utility::Get()->GetTimeResidualCalculator();
+  RAT::DU::Point3D::BeginOfRun();
+  fAVSystemId = RAT::DU::Point3D::GetSystemId("av");
 
   //// Get event and fit vertex
   const RAT::DS::Entry& r_DS = ds_reader.GetEntry( 0 );
@@ -245,7 +250,8 @@ double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::
     for( size_t i_pmt = 0; i_pmt < pmts.size(); i_pmt++ ) {
 	    //// Loop PMTs & get LLH
 	    const std::pair< UInt_t, double > pmt_pair = pmts.at(i_pmt);
-	    double emission_t = time_res_calc.CalcTimeResidual( pmt_pair.first, pmt_pair.second, cube_pos, cube_t, false, 3.103125 * 1e-6, true, 0.0 );
+      RAT::DU::Point3D cubePos(fAVSystemId, cube_pos);
+	    double emission_t = time_res_calc.CalcTimeResidual( pmt_pair.first, pmt_pair.second, cubePos, cube_t, false, 3.103125 * 1e-6, true, 0.0, false, 800 );
 	
 	    if(emission_t > -cube_rad_t && emission_t < cube_rad_t){
 	      //// If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
