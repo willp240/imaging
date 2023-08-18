@@ -34,7 +34,7 @@ void PlotItThen(TString fname){
   for(int i=0; i<=new_t->GetXaxis()->GetNbins(); i++){
     for(int j=0; j<=new_t->GetYaxis()->GetNbins(); j++){
       for(int k=0; k<=new_t->GetZaxis()->GetNbins(); k++){
-	//	new_llh->SetBinContent(i,j,k,0);
+	      //	new_llh->SetBinContent(i,j,k,0);
       }
     }
   }
@@ -43,25 +43,25 @@ void PlotItThen(TString fname){
     for(int j=0; j<12; j++){
       for(int k=0; k<12; k++){
 	
-	double bestllh = 0;
-	for(int x=0; x<10; x++){
-	  for(int y=0; y<10; y++){
-	    for(int z=0; z<10; z++){
+	      double bestllh = 0;
+	      for(int x=0; x<10; x++){
+	        for(int y=0; y<10; y++){
+	          for(int z=0; z<10; z++){
 	      
-	      double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
-	      if( llh > bestllh)
-		      bestllh = llh;
-	    }
-	  }
-	}
+	            double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
+	            if( llh > bestllh)
+		            bestllh = llh;
+	            }
+	          }
+	        }
 
-	for(int x=0; x<10; x++){
+	      for(int x=0; x<10; x++){
           for(int y=0; y<10; y++){
             for(int z=0; z<10; z++){
 
               double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
 	            double t = h_t->GetBinContent( i*10+x, j*10+y, k*10+z );
-	            if( llh > 0.5*bestllh ){
+	            if( llh > 0.9*bestllh ){
 		            new_llh->SetBinContent( i*10+x, j*10+y, k*10+z, llh );
 		            new_t->SetBinContent( i*10+x, j*10+y, k*10+z, t );
 	            }
@@ -140,7 +140,7 @@ void PlotItThen(TString fname){
   new_t->GetZaxis()->SetTitleOffset(1.7);
   new_t->GetZaxis()->SetLabelSize(0.03);
   //new_t->GetZaxis()->SetLabelFont(42);
-  new_t->SetMinimum(270);
+  //new_t->SetMinimum(270);
   gPad->Update();
   palette = (TPaletteAxis*)new_t->GetListOfFunctions()->FindObject("palette");
   palette->SetX1NDC(0.88);
@@ -200,8 +200,8 @@ void StraightPlot(TString fname){
         //if(tbin>0)
           //std::cout << tbin << " " << tvec.at(tbin) << " " << h_llh->GetBinContent(i,j,k) << std::endl;
        	if( h_llh->GetBinContent(i,j,k)>0){// && h_llh->GetBinContent(i,j,k) > tvec.at(tbin) ){
-	  new_llh->SetBinContent(i,j,k, h_llh->GetBinContent(i,j,k));
-	  new_t->SetBinContent(i,j,k, h_t->GetBinContent(i,j,k));
+	        new_llh->SetBinContent(i,j,k, h_llh->GetBinContent(i,j,k));
+	        new_t->SetBinContent(i,j,k, h_t->GetBinContent(i,j,k));
           /*
           if(tvec.at(tbin) > 0){
             new_llh->SetBinContent(tx.at(tbin),ty.at(tbin),tz.at(tbin),0);
@@ -212,7 +212,7 @@ void StraightPlot(TString fname){
           tx.at(tbin) = i;
           ty.at(tbin) = j;
           tz.at(tbin) = k;*/
-	}
+	      }
       }
     }
   }
