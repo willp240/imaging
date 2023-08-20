@@ -81,3 +81,5 @@ Run as:
 Classes:
 "Cube" contains the centre coordinates of the cube your testing, it's "radius", best fit time, best fit overlap, and a method to divide it into a collection of sub cubes.
 "CubeCollection" is essentially a vector of cubes
+
+"Cube4D" and "Cube4DCollection" are like "Cube" and "CubeCollection", but the 'cubes' also have a time dimension.
