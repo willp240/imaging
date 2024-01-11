@@ -79,14 +79,14 @@ int main( int argc, char **argv ) {
   std::cout << std::endl;
 
   //// Make vector of pmts to assign to each initial cube
-	std::vector< std::pair < UInt_t, double > > pmts;
-	for(size_t i_pmt = 0; i_pmt < calibrated_PMTs.GetCount(); i_pmt++) {
-	  RAT::DS::PMTCal pmt = calibrated_PMTs.GetPMT( i_pmt );
+  std::vector< std::pair < UInt_t, double > > pmts;
+  for(size_t i_pmt = 0; i_pmt < calibrated_PMTs.GetCount(); i_pmt++) {
+    RAT::DS::PMTCal pmt = calibrated_PMTs.GetPMT( i_pmt );
     UInt_t PMT_ID = pmt.GetID();
     double PMT_t = pmt.GetTime();
     std::pair < UInt_t, double > pmt_pair( PMT_ID, PMT_t);
     pmts.push_back( pmt_pair );
-	}
+  }
 
   std::cout << "xyz: " << min_xyz << " " << max_xyz << std::endl;
   std::cout << "t: " << min_t << " " << max_t << std::endl;
@@ -99,20 +99,20 @@ int main( int argc, char **argv ) {
     for(double y = min_xyz + init_cube_rad; y < max_xyz; y += 2*init_cube_rad) {
       for(double z = min_xyz + init_cube_rad; z < max_xyz; z += 2*init_cube_rad) {
 
-	      TVector3 cube_pos(x, y, z);
-	      if( cube_pos.Mag() > 5500)
-	        continue;
+        TVector3 cube_pos(x, y, z);
+        if( cube_pos.Mag() > 5500)
+          continue;
 
-	      //// Make cube
-	      Cube4D* cub = new Cube4D( x, y, z, init_cube_rad );
+        //// Make cube
+        Cube4D* cub = new Cube4D( x, y, z, init_cube_rad );
 
-	      //// Get PMTs associated with the cube (at this point, all hit PMTs)
-	      cub->SetPMTs( pmts );
+        //// Get PMTs associated with the cube (at this point, all hit PMTs)
+        cub->SetPMTs( pmts );
 
-	      //std::cout << "Adding initial cube at " << x << " " << y << " " << z << std::endl;
+        //std::cout << "Adding initial cube at " << x << " " << y << " " << z << std::endl;
 
-	      //// Add it to collection
-	      init_cube_col->AddCube( cub );
+        //// Add it to collection
+        init_cube_col->AddCube( cub );
       }
     }
   } //// End loop over xyz of cubes
@@ -209,32 +209,32 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 
       //// If we're above the resolution, we might want to divide the cube into subcubes
       if( cube_r > res && best_global_overlap > hit_cut ){
-      
+
         //// If llh > 50% best
         if( cub->GetLLH() > hit_cut ){ // 0.5*best_global_overlap ) {
-	        Cube4DCollection* new_col = cub->Divide( factor );
+          Cube4DCollection* new_col = cub->Divide( factor );
 
-	        //// Each new cube has same associated PMTs as the parent bigger cube
-	        new_col->SetPMTs( cub->GetPMTs() );
-	
+          //// Each new cube has same associated PMTs as the parent bigger cube
+          new_col->SetPMTs( cub->GetPMTs() );
+
           double new_rad_t = init_cube_rad_t / factor;
           double new_min_t = t - init_cube_rad_t;
           double new_max_t = t + init_cube_rad_t;
 
-	        std::cout << std::endl << "Dividing cube " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetLLH() << " " << factor << std::endl;
-	        //std::cout << "\t starts " << cube_x - cube_r << " " << cube_y - cube_r << " " << cube_z - cube_r << std::endl;
-	        //std::cout << "\t end " << cube_x + cube_r <<" " << cube_y + cube_r << " " << cube_z + cube_r<< std::endl;	
+          std::cout << std::endl << "Dividing cube " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetLLH() << " " << factor << std::endl;
+          //std::cout << "\t starts " << cube_x - cube_r << " " << cube_y - cube_r << " " << cube_z - cube_r << std::endl;
+          //std::cout << "\t end " << cube_x + cube_r <<" " << cube_y + cube_r << " " << cube_z + cube_r<< std::endl;	
 
-	        //// Rerun adaptive grid on new collection
-	        AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor, hit_cut/(factor) );
+          //// Rerun adaptive grid on new collection
+          AdapGrid( new_col, final_cube_col, pmt_info, time_res_calc, calibrated_PMTs, pmts, new_min_t, new_max_t, new_rad_t, res, factor, hit_cut/(factor) );
         }
-      // std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
+        // std::cout << "ending journey " << cube_x << " " << cube_y << " " << cube_z << std::endl;
       }
       else { 
         //std::cout << "Adding final cubes " << cube_x << " " << cube_y << " " << cube_z << " " << cub->GetLLH() << std::endl;
         final_cube_col->AddCube( cub );
       }
-   } //// End 2nd loop over cubes
+    } //// End 2nd loop over cubes
     delete col;
   } //// End loop over t
 }
@@ -242,7 +242,7 @@ void AdapGrid( Cube4DCollection* init_cube_col, Cube4DCollection* &final_cube_co
 
 //// Function to calculate overlap for cubes in a cube collection
 double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::TimeResidualCalculator time_res_calc, RAT::DS::CalPMTs calibrated_PMTs ) {
-
+  
   double best_global_overlap = 0;
 
   //// Loop Cubes
@@ -262,21 +262,21 @@ double CalcOverlap( Cube4DCollection* &col, RAT::DU::PMTInfo pmt_info, RAT::DU::
     std::vector< std::pair< UInt_t, double > > pmts = cub->GetPMTs();
     for( size_t i_pmt = 0; i_pmt < pmts.size(); i_pmt++ ) {
 
-	    //// Loop PMTs & get LLH
-	    const std::pair< UInt_t, double > pmt_pair = pmts.at(i_pmt);
+      //// Loop PMTs & get LLH
+      const std::pair< UInt_t, double > pmt_pair = pmts.at(i_pmt);
       RAT::DU::Point3D cubePos(fAVSystemId, cube_pos);
 
-	    double emission_t = time_res_calc.CalcTimeResidual( pmt_pair.first, pmt_pair.second, cubePos, cube_t, false, 3.103125 * 1e-6, true, 0.0, false, 800 );
+      double emission_t = time_res_calc.CalcTimeResidual( pmt_pair.first, pmt_pair.second, cubePos, cube_t, false, 3.103125 * 1e-6, true, 0.0, false, 800 );
 
-	    if(emission_t > -cube_rad_t && emission_t < cube_rad_t){
-	      //// If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
-	      overlap++;
-	      pmt_list.push_back( pmt_pair );
-	    }
-
-    }  //// End loop over hits
+      if(emission_t > -cube_rad_t && emission_t < cube_rad_t){
+        //// If we have time residual close to 0, add one to overlap, and save PMT so it's remains associated with the cube
+        overlap++;
+        pmt_list.push_back( pmt_pair );
+      }
       
-   // std::cout << "Cube at " << cube_x << " " << cube_y << " " << cube_z << " overlap " << overlap << " at " << cube_t << std::endl;
+    }  //// End loop over hits
+    
+    // std::cout << "Cube at " << cube_x << " " << cube_y << " " << cube_z << " overlap " << overlap << " at " << cube_t << std::endl;
     
     //// Store overlap PMT IDs
     cub->SetLLH( overlap );

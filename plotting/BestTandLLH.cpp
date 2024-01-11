@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 
-void BestTandLLH(TString fname){
+void BestTandLLH(TString fname, TString outname){
 
   TFile *f = TFile::Open(fname);
 
@@ -25,7 +25,9 @@ void BestTandLLH(TString fname){
     //double t = 276.524 - 9 + 0.3*i;
     //double t = 255.837 - 9 + 0.3*i;
     //    double t = 257.86 - 9 + 0.3*i;
-    double t = 226.861 + 0.3*i;
+    //double t = 226.861 + 0.3*i;
+    double t = 263.183548 + 0.3*i;
+    //double t = 232.627215 + 0.3*i;
     //double t = 264.811 - 9 + 0.3*i;
     //double n = 3180.681152 + 80*i;
 
@@ -38,11 +40,13 @@ void BestTandLLH(TString fname){
       h_t = (TH3D*)f->Get(hname)->Clone();
       h_t->SetName("h_t");
       h_t->SetTitle("Emission Time");
+      h_t->GetZaxis()->SetTitleOffset(1.58);
       h_t->Reset();
       h_llh = (TH3D*)f->Get(hname)->Clone();
       h_llh->Reset();
       h_llh->SetName("h_llh");
-      h_llh->SetTitle("");
+      h_llh->SetTitle("Overlap Density");
+      h_llh->GetZaxis()->SetTitleOffset(1.58);
       std::cout << "done 0 " << std::endl;
       flag = 1;
     }
@@ -60,13 +64,13 @@ void BestTandLLH(TString fname){
           if(sqrt(x*x + y*y + z*z) > 5500)
             continue;
 
-	        if(h->GetBinContent(j, k, l) > h_llh->GetBinContent(j, k, l)){
-	          if(h->GetBinContent(j, k, l) > 0.99*max){
-              h_llh->SetBinContent(j, k, l, h->GetBinContent(j,k,l));
-	            h_t->SetBinContent(j, k, l, t);
-            }
-	        }
-	      }
+	  if(h->GetBinContent(j, k, l) > h_llh->GetBinContent(j, k, l)){
+	    if(h->GetBinContent(j, k, l) > 0.90*max){
+	      h_llh->SetBinContent(j, k, l, h->GetBinContent(j,k,l));
+	      h_t->SetBinContent(j, k, l, t);
+	    }
+	  }
+	}
       }
     }    
   }
@@ -87,11 +91,13 @@ void BestTandLLH(TString fname){
   c1->cd();
   h_t->Draw("box2Z");
   gPad->Update();
+
   TPaletteAxis *palette = (TPaletteAxis*)h_t->GetListOfFunctions()->FindObject("palette");
-  palette->SetX1NDC(0.88);
-  palette->SetX2NDC(0.93);
-  palette->SetY1NDC(0.22);
-  palette->SetY2NDC(0.82);
+  //  palette->SetX1NDC(0.88);
+  //palette->SetX2NDC(0.93);
+  //palette->SetY1NDC(0.22);
+  //palette->SetY2NDC(0.82);
+
   gPad->Update();
   h_t->SetMinimum(200);
   h_t->Draw("box2Z");
@@ -101,19 +107,25 @@ void BestTandLLH(TString fname){
   h_llh->Draw("box2Z");
   gPad->Update();
   palette = (TPaletteAxis*)h_llh->GetListOfFunctions()->FindObject("palette");
-  palette->SetX1NDC(0.88);
-  palette->SetX2NDC(0.93);
-  palette->SetY1NDC(0.22);
-  palette->SetY2NDC(0.82);
+  //palette->SetX1NDC(0.88);
+  //palette->SetX2NDC(0.93);
+  //palette->SetY1NDC(0.22);
+  //palette->SetY2NDC(0.82);
   gPad->Update();
 
   h_llh->Draw("box2Z");
   g->Draw("AP same");
 
-  TFile fout("output1m_3m_.99.root","RECREATE");
+  TFile fout(outname,"RECREATE");
   h_t->Write("h_t");
   h_llh->Write("h_llh");
   c1->Write("c_t");
   c2->Write("c_llh");
-  
+
+  TString t_pdfname = outname.ReplaceAll(".root", "_tcanv.pdf");
+  TString llh_pdfname = outname.ReplaceAll("_tcanv.pdf", "_llhcanv.pdf");
+
+  c1->SaveAs(t_pdfname);
+  c2->SaveAs(llh_pdfname);
+
 }

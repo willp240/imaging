@@ -10,7 +10,7 @@
 #include <string>
 #include <iostream>
 
-void PlotItThen(TString fname){
+void PlotHist(TString fname, TString outname){
 
   TFile *f = TFile::Open(fname);
 
@@ -34,7 +34,7 @@ void PlotItThen(TString fname){
   for(int i=0; i<=new_t->GetXaxis()->GetNbins(); i++){
     for(int j=0; j<=new_t->GetYaxis()->GetNbins(); j++){
       for(int k=0; k<=new_t->GetZaxis()->GetNbins(); k++){
-	      //	new_llh->SetBinContent(i,j,k,0);
+	new_llh->SetBinContent(i,j,k,0);
       }
     }
   }
@@ -43,28 +43,28 @@ void PlotItThen(TString fname){
     for(int j=0; j<12; j++){
       for(int k=0; k<12; k++){
 	
-	      double bestllh = 0;
-	      for(int x=0; x<10; x++){
-	        for(int y=0; y<10; y++){
-	          for(int z=0; z<10; z++){
+	double bestllh = 0;
+	for(int x=0; x<10; x++){
+	  for(int y=0; y<10; y++){
+	    for(int z=0; z<10; z++){
 	      
-	            double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
-	            if( llh > bestllh)
-		            bestllh = llh;
-	            }
-	          }
-	        }
-
-	      for(int x=0; x<10; x++){
+	      double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
+	      if( llh > bestllh)
+		bestllh = llh;
+	    }
+	  }
+	}
+	
+	for(int x=0; x<10; x++){
           for(int y=0; y<10; y++){
             for(int z=0; z<10; z++){
-
+	      
               double llh = h_llh->GetBinContent( i*10+x, j*10+y, k*10+z );
-	            double t = h_t->GetBinContent( i*10+x, j*10+y, k*10+z );
-	            if( llh > 0.9*bestllh ){
-		            new_llh->SetBinContent( i*10+x, j*10+y, k*10+z, llh );
-		            new_t->SetBinContent( i*10+x, j*10+y, k*10+z, t );
-	            }
+	      double t = h_t->GetBinContent( i*10+x, j*10+y, k*10+z );
+	      if( llh > 0.95*bestllh && llh > 10 ){
+		new_llh->SetBinContent( i*10+x, j*10+y, k*10+z, llh );
+		new_t->SetBinContent( i*10+x, j*10+y, k*10+z, t );
+	      }
 	      
             }
           }
@@ -78,10 +78,10 @@ void PlotItThen(TString fname){
   int point = 0;
   for(double th=0; th<2*TMath::Pi(); th+=2*TMath::Pi()/50){
     for(double phi=0; phi<TMath::Pi(); phi+=TMath::Pi()/50){
-      double x = 6000*TMath::Sin(th)*TMath::Cos(phi);
-      double y = 6000*TMath::Sin(th)*TMath::Sin(phi);
-      double z = 6000*TMath::Cos(th);
-      g->SetPoint(point, x, y, z);
+      double x3 = 6000*TMath::Sin(th)*TMath::Cos(phi);
+      double y3 = 6000*TMath::Sin(th)*TMath::Sin(phi);
+      double z3 = 6000*TMath::Cos(th);
+      g->SetPoint(point, x3, y3, z3);
       point++;
     }
   }
@@ -152,7 +152,7 @@ void PlotItThen(TString fname){
   //new_t->Draw("box2Z same");
   
   //gPad->Update();
-  TFile fout("test.root","RECREATE");
+  TFile fout(outname,"RECREATE");
   new_t->SetLineWidth(0);
   new_llh->SetLineWidth(0);
   new_t->Write("new_t");
