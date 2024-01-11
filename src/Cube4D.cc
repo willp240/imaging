@@ -14,15 +14,15 @@ Cube4DCollection* Cube4D::Divide( int factor ){
     for(int i_y = 1; i_y <= 2*factor; i_y += 2) {
       for(int i_z = 1; i_z <= 2*factor; i_z += 2 ) {
 
-  	    double x = x_min + i_x*new_radius;
-	      double y = y_min + i_y*new_radius;
-	      double z = z_min + i_z*new_radius;
+	double x = x_min + i_x*new_radius;
+	double y = y_min + i_y*new_radius;
+	double z = z_min + i_z*new_radius;
 
-	      if( sqrt(x*x+y*y+z*z) > 5500 )
-	        continue;
+	if( sqrt(x*x+y*y+z*z) > 5500 )
+	  continue;
 
-        Cube4D* new_cube = new Cube4D( x, y, z, new_radius );
-	      col->AddCube( new_cube );
+	Cube4D* new_cube = new Cube4D( x, y, z, new_radius );
+	col->AddCube( new_cube );
       }
     }
   }
@@ -45,5 +45,5 @@ void Cube4D::RemovePMTs( std::vector< std::pair< UInt_t, double > > pmts_ ){
       i_pmt--;
     }	
   }
-
+  fLLH = fPMTs.size();
 }

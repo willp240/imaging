@@ -48,15 +48,29 @@ void Cube4DCollection::SetTRadius( double trad_ ) {
 
 
 void Cube4DCollection::RemoveRepeatedPMTs( ) {
-  
+
   this->SortByOverlap();
 
   std::vector<std::pair< UInt_t, double > > hit_pmts = fCubeVec.at(0)->GetPMTs();
 
   for( size_t i_cube = 1; i_cube < this->GetNCubes(); i_cube++ ) {
+    double cubeX = fCubeVec.at( i_cube )->GetX();
+    double cubeY = fCubeVec.at( i_cube )->GetY();
+    double cubeZ = fCubeVec.at( i_cube )->GetZ();
+    double cubellh = fCubeVec.at( i_cube )->GetLLH();
+
     fCubeVec.at( i_cube )->RemovePMTs( hit_pmts );
-    std::vector<std::pair< UInt_t, double > > temp_vec = fCubeVec.at(i_cube)->GetPMTs();
-    hit_pmts.insert( std::end(hit_pmts), std::begin(temp_vec), std::end(temp_vec) );
+
+    if ( cubellh != fCubeVec.at( i_cube )->GetLLH())
+      this->SortByOverlap();
+
+    if( abs(fCubeVec.at( i_cube )->GetX() - cubeX) < 0.1 && abs(fCubeVec.at( i_cube )->GetY() - cubeY) < 0.1 && abs(fCubeVec.at( i_cube )->GetZ() - cubeZ) < 0.1){
+      std::vector<std::pair< UInt_t, double > > temp_vec = fCubeVec.at(i_cube)->GetPMTs();
+      hit_pmts.insert( std::end(hit_pmts), std::begin(temp_vec), std::end(temp_vec) );
+    }
+    else
+      i_cube = i_cube - 1;
+
   }
 
 }

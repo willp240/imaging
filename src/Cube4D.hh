@@ -51,7 +51,7 @@ class Cube4D{
   double GetTRadius() const { return fTRadius; }
   void SetLLH( double llh_ ) { fLLH = llh_; }
   double GetLLH() const { return fLLH; }
-  void SetPMTs( std::vector< std::pair< UInt_t, double > > pmts_ ) { fPMTs = pmts_; }
+  void SetPMTs( std::vector< std::pair< UInt_t, double > > pmts_ ) { fPMTs = pmts_; fLLH = pmts_.size(); }
   void RemovePMTs( std::vector< std::pair< UInt_t, double > > pmts_ );
   std::vector< std::pair< UInt_t, double > > GetPMTs() const { return fPMTs; }
 
